@@ -3,8 +3,10 @@ import LighthouseRunner from "./LighthouseRunner.js"
 import Datadog from "./DatadogClient.js"
 import {v2} from '@datadog/datadog-api-client'
 import fs from 'node:fs'
-import type { Result } from 'lighthouse'
 import os from 'node:os'
+import type { Flags, Result, Config } from 'lighthouse'
+import lhDesktopConfig from 'lighthouse/core/config/lr-desktop-config.js'
+import lhMobileConfig from 'lighthouse/core/config/lr-mobile-config.js'
 import dotenv from 'dotenv'
 dotenv.config();
 
@@ -39,41 +41,51 @@ function retrieveDataPointsForAudits(results: Result, audits: string[]) {
 
     return values
 }
-(async() => {
+
+async function sendMetricsToDatadog(metricName: string, dataPoints: v2.MetricPoint[], tags: Record<string, string>) {
     const dd = new Datadog({
         api_key: process.env.DD_API_KEY || '',
         app_key: process.env.DD_APP_KEY || ''
     })
+    const tagsArray = Object.entries(tags).map(([key, value]) => `${key}:${value}`)
 
+    await dd.submitMetrics(metricName, dataPoints, tagsArray)
+}
+
+async function captureLighthouseMetrics(pageType: string, url: string, audits: string[], options: Flags = {}, config: Config = {}) {
+    const chromeRunner = new ChromeRunner()
+    const lighthouseRunner = new LighthouseRunner()
+
+    const port = await chromeRunner.start()
+    const results = await lighthouseRunner.run(url, {port: port, ...options}, config)
+
+    chromeRunner.stop()
+
+    const metrics = retrieveDataPointsForAudits(results, audits)
+
+    const tags = {
+        'url': url,
+        'page_type': pageType,
+        'lighthouse_version': results.lighthouseVersion,
+        'form_factor': results.configSettings.formFactor,
+        'host': os.hostname()
+    }
+
+    for (let [audit, dataPoints] of Object.entries(metrics)) {
+        await sendMetricsToDatadog(`lighthouse.${audit}.value`, [dataPoints.numericValue], tags)
+        await sendMetricsToDatadog(`lighthouse.${audit}.score`, [dataPoints.score], tags)
+    }
+
+}
+(async() => {
     const inspectList: Record<string, string[]> = JSON.parse(await fs.promises.readFile('urls.json', 'utf8'));
 
     const coreMetrics: Record<string, string[]> = JSON.parse(await fs.promises.readFile('metrics-config.json', 'utf8'));
 
     for (let [pageType, urls] of Object.entries(inspectList)) {
         for (let url of urls) {
-            const chromeRunner = new ChromeRunner(false)
-            const lighthouseRunner = new LighthouseRunner()
-
-            const port = await chromeRunner.start()
-            const results = await lighthouseRunner.run(url, {port: port})
-
-            chromeRunner.stop()
-
-            const metrics = retrieveDataPointsForAudits(results, coreMetrics['audits'])
-
-            const tags = {
-                'url': url,
-                'page_type': pageType,
-                'lighthouse_version': results.lighthouseVersion,
-                'host': os.hostname()
-            }
-
-            const tagsArray = Object.entries(tags).map(([key, value]) => `${key}:${value}`)
-
-            for (let [audit, dataPoints] of Object.entries(metrics)) {
-                await dd.submitMetrics(`lighthouse.${audit}.value`, [dataPoints.numericValue], tagsArray)
-                await dd.submitMetrics(`lighthouse.${audit}.score`, [dataPoints.numericValue], tagsArray)
-            }
+            await captureLighthouseMetrics(pageType, url, coreMetrics.audits, {}, lhDesktopConfig)
+            await captureLighthouseMetrics(pageType, url, coreMetrics.audits, {}, lhMobileConfig)
         }
     }
 })()

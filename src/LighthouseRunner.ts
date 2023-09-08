@@ -1,5 +1,5 @@
 import lighthouse from 'lighthouse';
-import type {Flags, Result} from 'lighthouse';
+import type {Flags, Result, Config} from 'lighthouse';
 
 export default class LighthouseRunner {
     private lhOptions: Flags = {
@@ -7,8 +7,8 @@ export default class LighthouseRunner {
         logLevel: 'silent',
     }
 
-    async run(url: string, lhOptions: Flags = {}): Promise<Result> {
-        const result = await lighthouse(url, {...this.lhOptions, ...lhOptions})
+    async run(url: string, lhOptions: Flags = {}, config: Config = {}): Promise<Result> {
+        const result = await lighthouse(url, {...this.lhOptions, ...lhOptions}, config)
 
         if (result) {
             return result.lhr
