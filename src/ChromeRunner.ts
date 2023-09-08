@@ -11,8 +11,9 @@ export default class ChromeRunner {
         }
     }
 
-    async start(): Promise<void> {
+    async start(): Promise<number> {
         this.chrome = await launch({ chromeFlags: this.flags })
+        return this.chrome.port
     }
 
     stop() {
