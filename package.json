@@ -1,0 +1,19 @@
+{
+  "name": "vigilo",
+  "version": "1.0.0",
+  "description": "Vigilo is a monitoring tool that automates Lighthouse audits and sends key metrics to Datadog. Designed to keep a vigilant eye on your web application's performance and accessibility.",
+  "main": "dist/index.js",
+  "repository": "https://github.com/iFixit/vigilo.git",
+  "scripts": {
+    "start": "node dist/index.js",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Angel de la Torre <angel.dlt.1996@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.5.9",
+    "typescript": "^5.2.2"
+  }
+}
