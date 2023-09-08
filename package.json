@@ -18,5 +18,8 @@
     "@tsconfig/node18": "^18.2.1",
     "@types/node": "^20.5.9",
     "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "chrome-launcher": "^1.0.0"
   }
 }
