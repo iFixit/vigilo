@@ -56,6 +56,8 @@ async function captureLighthouseMetrics(pageType: string, url: string, audits: s
     const chromeRunner = new ChromeRunner()
     const lighthouseRunner = new LighthouseRunner()
 
+    const formFactor = config.settings?.formFactor || 'mobile'
+    console.log(`Running Lighthouse for ${url} with form factor: ${formFactor}`);
     const port = await chromeRunner.start()
     const results = await lighthouseRunner.run(url, {port: port, ...options}, config)
 
@@ -71,11 +73,14 @@ async function captureLighthouseMetrics(pageType: string, url: string, audits: s
         'host': os.hostname()
     }
 
+    console.log(`Sending metrics to Datadog for ${url}`)
     for (let [audit, dataPoints] of Object.entries(metrics)) {
         await sendMetricsToDatadog(`lighthouse.${audit}.value`, [dataPoints.numericValue], tags)
         await sendMetricsToDatadog(`lighthouse.${audit}.score`, [dataPoints.score], tags)
     }
+    console.log(`Done sending metrics to Datadog for ${url}`)
 
+    console.log(`Done running Lighthouse for ${url} with form factor: ${formFactor}\n`);
 }
 (async() => {
     const inspectList: Record<string, string[]> = JSON.parse(await fs.promises.readFile('urls.json', 'utf8'));
@@ -83,9 +88,16 @@ async function captureLighthouseMetrics(pageType: string, url: string, audits: s
     const coreMetrics: Record<string, string[]> = JSON.parse(await fs.promises.readFile('metrics-config.json', 'utf8'));
 
     for (let [pageType, urls] of Object.entries(inspectList)) {
+        console.log(`Capturing metrics for ${pageType} page(s)\n`)
+
         for (let url of urls) {
             await captureLighthouseMetrics(pageType, url, coreMetrics.audits, {}, lhDesktopConfig)
+
             await captureLighthouseMetrics(pageType, url, coreMetrics.audits, {}, lhMobileConfig)
         }
+
+        console.log(`Done capturing metrics for ${pageType} page(s)\n`)
     }
+
+    console.log('Done capturing metrics for all pages')
 })()
