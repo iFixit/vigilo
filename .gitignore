@@ -29,3 +29,7 @@ node_modules/
 
 # VSCode Misc.
 .vscode
+
+# Config Files
+urls.json
+metrics-config.json

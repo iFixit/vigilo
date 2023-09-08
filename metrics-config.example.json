@@ -1,0 +1,13 @@
+{
+    "audits": [
+        "largest-contentful-paint",
+        "first-contentful-paint",
+        "cumulative-layout-shift",
+        "total-blocking-time",
+        "speed-index",
+        "total-byte-weight",
+        "server-response-time",
+        "is-crawlable",
+        "screenshot-thumbnails"
+    ]
+}
