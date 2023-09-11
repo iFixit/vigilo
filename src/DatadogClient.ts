@@ -33,7 +33,7 @@ export default class DatadogClient {
 
         const response = await metricsApiInstance.submitMetrics(params);
 
-        if (response.errors && response.errors.length > 0) {
+        if (response.errors?.length) {
             throw new Error(response.errors.join(', '));
         }
     }
