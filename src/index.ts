@@ -42,6 +42,23 @@ function retrieveDataPointsForAudits(results: Result, audits: string[]) {
     return values
 }
 
+/**
+ * Adds `rand={123..}` param to the urls to ensure we never hit a CDN cache.
+ */
+function addRandomParamToUrl(inspectList: Record<string, string[]>): void {
+    for (const pageType in inspectList) {
+        if (inspectList.hasOwnProperty(pageType)) {
+            const urls = inspectList[pageType];
+
+            inspectList[pageType] = urls.map(url => {
+                const urlObject = new URL(url);
+                urlObject.searchParams.append('rand', Math.floor(Math.random() * 1000000).toString());
+                return urlObject.toString();
+            });
+        }
+    }
+}
+
 async function sendMetricsToDatadog(metricName: string, dataPoints: v2.MetricPoint[], tags: Record<string, string>) {
     const dd = new Datadog({
         api_key: process.env.DD_API_KEY || '',
@@ -84,6 +101,7 @@ async function captureLighthouseMetrics(pageType: string, url: string, audits: s
 }
 (async() => {
     const inspectList: Record<string, string[]> = JSON.parse(await fs.promises.readFile('urls.json', 'utf8'));
+    addRandomParamToUrl(inspectList);
 
     const coreMetrics: Record<string, string[]> = JSON.parse(await fs.promises.readFile('metrics-config.json', 'utf8'));
 
