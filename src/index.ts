@@ -47,15 +47,13 @@ function retrieveDataPointsForAudits(results: Result, audits: string[]) {
  */
 function addRandomParamToUrl(inspectList: Record<string, string[]>): void {
     for (const pageType in inspectList) {
-        if (inspectList.hasOwnProperty(pageType)) {
-            const urls = inspectList[pageType];
+        const urls = inspectList[pageType];
 
-            inspectList[pageType] = urls.map(url => {
-                const urlObject = new URL(url);
-                urlObject.searchParams.append('rand', Math.floor(Math.random() * 1000000).toString());
-                return urlObject.toString();
-            });
-        }
+        inspectList[pageType] = urls.map(url => {
+            const urlObject = new URL(url);
+            urlObject.searchParams.append('rand', Math.floor(Math.random() * 1000000).toString());
+            return urlObject.toString();
+        });
     }
 }
 
