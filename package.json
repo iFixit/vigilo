@@ -5,6 +5,9 @@
   "main": "dist/index.js",
   "repository": "https://github.com/iFixit/vigilo.git",
   "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "start": "node dist/index.js",
     "clean": "rm -rf dist",
