@@ -22,8 +22,7 @@ export default class BrowserRunner {
 
     async start(): Promise<Page> {
         this.browser = await puppeteer.launch(this.launchOptions);
-        const page = await this.browser.newPage();
-        return page;
+        return await this.browser.newPage();
     }
 
     async stop() {
