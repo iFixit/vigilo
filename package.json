@@ -21,8 +21,8 @@
   },
   "dependencies": {
     "@datadog/datadog-api-client": "^1.16.0",
-    "chrome-launcher": "^1.0.0",
     "dotenv": "^16.3.1",
-    "lighthouse": "^11.1.0"
+    "lighthouse": "^11.1.0",
+    "puppeteer": "^21.2.1"
   }
 }

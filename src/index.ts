@@ -1,4 +1,4 @@
-import ChromeRunner from "./ChromeRunner.js"
+import BrowserRunner from "./BrowserRunner.js"
 import LighthouseRunner from "./LighthouseRunner.js"
 import Datadog from "./DatadogClient.js"
 import {v2} from '@datadog/datadog-api-client'
@@ -53,15 +53,15 @@ async function sendMetricsToDatadog(metricName: string, dataPoints: v2.MetricPoi
 }
 
 async function captureLighthouseMetrics(pageType: string, url: string, audits: string[], options: Flags = {}, config: Config = {}) {
-    const chromeRunner = new ChromeRunner()
+    const browserRunner = new BrowserRunner(false)
     const lighthouseRunner = new LighthouseRunner()
 
     const formFactor = config.settings?.formFactor || 'mobile'
     console.log(`Running Lighthouse for ${url} with form factor: ${formFactor}`);
-    const port = await chromeRunner.start()
-    const results = await lighthouseRunner.run(url, {port: port, ...options}, config)
+    const page = await browserRunner.start()
+    const results = await lighthouseRunner.run(url, {...options}, config, page)
 
-    chromeRunner.stop()
+    await browserRunner.stop()
 
     const metrics = retrieveDataPointsForAudits(results, audits)
 
