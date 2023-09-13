@@ -101,12 +101,12 @@ async function captureLighthouseMetrics(pageType: string, url: string, audits: s
     console.log(`Done running Lighthouse for ${url} with form factor: ${formFactor}\n`);
 }
 (async() => {
-    const inspectList: Record<string, string[]> = JSON.parse(await fs.promises.readFile('urls.json', 'utf8'));
-    const updatedInspectList: Record<string, string[]> = addRandomParamToUrl(inspectList);
+    let inspectList: Record<string, string[]> = JSON.parse(await fs.promises.readFile('urls.json', 'utf8'));
+    inspectList = addRandomParamToUrl(inspectList);
 
     const coreMetrics: Record<string, string[]> = JSON.parse(await fs.promises.readFile('metrics-config.json', 'utf8'));
 
-    for (let [pageType, urls] of Object.entries(updatedInspectList)) {
+    for (let [pageType, urls] of Object.entries(inspectList)) {
         console.log(`Capturing metrics for ${pageType} page(s)\n`)
 
         for (let url of urls) {
