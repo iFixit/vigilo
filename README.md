@@ -14,5 +14,20 @@ Vigilo is a monitoring tool that automates Lighthouse audits and sends key metri
 8. Run `cp metrics.example.json metrics.json`
 9. Add the metrics you want to send to Datadog to the `metrics.json` file
 
+⚠️ If you are setting this up on a Windows machine via WSL, then you will need to run the following commands to ensure the correct linux dependencies are installed:
+**Make sure dependencies are up to date**
+```
+sudo apt update && sudo apt -y upgrade && sudo apt -y autoremove
+```
+**Download and Install Chrome**
+```
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+sudo apt -y install ./google-chrome-stable_current_amd64.deb
+```
+**Check Chrome was Successfully Installed**
+```
+google-chrome --version
+```
+
 ### Usage
 1. After setup, run `pnpm start` to run vigilo and send metrics to Datadog
