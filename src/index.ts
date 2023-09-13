@@ -53,7 +53,7 @@ async function sendMetricsToDatadog(metricName: string, dataPoints: v2.MetricPoi
 }
 
 async function captureLighthouseMetrics(pageType: string, url: string, audits: string[], options: Flags = {}, config: Config = {}) {
-    const browserRunner = new BrowserRunner(false)
+    const browserRunner = new BrowserRunner()
     const lighthouseRunner = new LighthouseRunner()
 
     const formFactor = config.settings?.formFactor || 'mobile'
