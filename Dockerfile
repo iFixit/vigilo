@@ -14,6 +14,7 @@ WORKDIR /app
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 ENV PUPPETEER_EXECUTABLE_PATH /usr/bin/chromium
 ENV CHROMIUM_FLAGS="--headless --no-sandbox --disable-dev-shm-usage"
+ENV DOCKER true
 
 RUN pnpm install --frozen-lockfile
 RUN pnpm run build
