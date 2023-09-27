@@ -11,7 +11,7 @@ Vigilo is a monitoring tool that automates Lighthouse audits and sends key metri
 5. Add your Datadog API key and Datadog Application key to the `.env` file
 6. Run `cp urls.example.json urls.json`
 7. Add your URLs to the `urls.json` file
-8. Run `cp metrics.example.json metrics.json`
+8. Run `cp metrics-config.example.json metrics-config.json`
 9. Add the metrics you want to send to Datadog to the `metrics.json` file
 
 ⚠️ If you are setting this up on a Windows machine via WSL, then you will need to run the following commands to ensure the correct linux dependencies are installed:
@@ -38,7 +38,7 @@ google-chrome --version
 3. Add your Datadog API key and Datadog Application key to the `.env` file
 4. Run `cp urls.example.json urls.json`
 5. Add your URLs to the `urls.json` file
-6. Run `cp metrics.example.json metrics.json`
+6. Run `cp metrics-config.example.json metrics-config.json`
 7. Add the metrics you want to send to Datadog to the `metrics.json` file
 8. Run `docker build -t vigilo .`
 
