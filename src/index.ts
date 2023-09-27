@@ -83,12 +83,15 @@ async function captureLighthouseMetrics(pageType: string, url: string, audits: s
 
     const metrics = retrieveDataPointsForAudits(results, audits)
 
+    const isDocker = process.env.DOCKER === 'true'
+    const hostName = isDocker ? `docker-container` : os.hostname();
+
     const tags = {
         'url': url,
         'page_type': pageType,
         'lighthouse_version': results.lighthouseVersion,
         'form_factor': results.configSettings.formFactor,
-        'host': os.hostname()
+        'host': hostName
     }
 
     console.log(`Sending metrics to Datadog for ${url}`)
