@@ -9,6 +9,41 @@ const inspectList = JSON.parse(fs.readFileSync('urls.json', 'utf8'));
 const coreMetrics = JSON.parse(fs.readFileSync('metrics-config.json', 'utf8'));
 const host = 'ubreakit.com';
 
+function getWidget(title: string, type: string, requests: any[] = [], widgets: any[] = [], markers: any[] = []) {
+    return {
+        definition: {
+            title: title,
+            titleSize: "16",
+            titleAlign: "left",
+            showLegend: false,
+            type: type,
+            layoutType: "ordered",
+            requests: requests,
+            widgets: widgets,
+            markers: markers,
+        }
+    }
+}
+
+// Capitalize and replace dashes with space for audit names
+function replaceAndCapitalize(input: string): string {
+    const words = input.split('-');
+    const capitalizedWords = words.map(word => word.charAt(0).toUpperCase() + word.slice(1));
+    return capitalizedWords.join(' ');
+  }
+
+function getWidgetForAllAudits(): v1.Widget[] {
+    const audits = coreMetrics.audits;
+
+    const widgetDefinitions: v1.Widget[] = audits.map(audit => {
+        const title = replaceAndCapitalize(audit);
+        return getWidget(title, 'group')
+    })
+
+    return widgetDefinitions
+}
+
+
 function getDashboardsApiBody(): v1.DashboardsApiCreateDashboardRequest {
     return {
         body: {
@@ -22,7 +57,7 @@ function getDashboardsApiBody(): v1.DashboardsApiCreateDashboardRequest {
                 },
             ],
             layoutType: "ordered",
-            widgets: [],
+            widgets: getWidgetForAllAudits() as v1.Widget[],
         }
     }
 }
