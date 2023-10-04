@@ -29,12 +29,14 @@ const defaultWidgetDefinition: WidgetDefinition = {
     markers: []
 }
 
-const inspectList = JSON.parse(fs.readFileSync('urls.json', 'utf8'));
-const coreMetrics = JSON.parse(fs.readFileSync('metrics-config.json', 'utf8'));
-const host = 'ubreakit.com';
+const URLS_FILE_PATH = 'urls.json';
+const METRICS_CONFIG_PATH = 'metrics-config.json';
+const HOST = 'ubreakit.com';
+const INSPECT_LIST = JSON.parse(fs.readFileSync(URLS_FILE_PATH, 'utf8'));
+const CORE_METRICS = JSON.parse(fs.readFileSync(METRICS_CONFIG_PATH, 'utf8'));
 
 // Auditname -> {warning: "warning value", alert: "alert value"}
-const existingMarkers = {
+const ALERT_MARKERS = {
     'largest-contentful-paint': {
         "warning": "2500 < y < 4000",
         "alert": "y > 4000",
@@ -58,15 +60,15 @@ const existingMarkers = {
 };
 
 function fetchAlertMarkersForAudit(auditName: string) {
-    return existingMarkers.hasOwnProperty(auditName) ? [
+    return ALERT_MARKERS.hasOwnProperty(auditName) ? [
         {
             "label": "Alert",
-            "value": existingMarkers[auditName].alert,
+            "value": ALERT_MARKERS[auditName].alert,
             "display_type": "error dashed"
         },
         {
             "label": "Warning",
-            "value": existingMarkers[auditName].warning,
+            "value": ALERT_MARKERS[auditName].warning,
             "display_type": "warning dashed"
         }
     ] : []
@@ -85,7 +87,7 @@ function createWidgetRequestsForMetric(audit: string, pageType: string) {
                 {
                     name: "query1",
                     dataSource: "metrics",
-                    query: `avg:lighthouse.${formatMetricNameForDatadog(audit)}{host:${host},page_type:${formatMetricNameForDatadog(pageType)},$FormFactor} by {page_type,url,form_factor}`
+                    query: `avg:lighthouse.${formatMetricNameForDatadog(audit)}{host:${HOST},page_type:${formatMetricNameForDatadog(pageType)},$FormFactor} by {page_type,url,form_factor}`
                 },
             ],
             formulas: [ {formula: "query1"} ],
@@ -106,7 +108,7 @@ function createWidget(widget: Partial<WidgetDefinition>) {
 }
 
 function createWidgetsForAllPageTypes(audit: string) {
-    const pageTypes = Object.keys(inspectList);
+    const pageTypes = Object.keys(INSPECT_LIST);
     const markers = fetchAlertMarkersForAudit(audit);
     const widgetDefinitions = pageTypes.map(pageType => {
         const requests = createWidgetRequestsForMetric(audit, pageType);
@@ -124,7 +126,7 @@ function formatAuditName(input: string): string {
   }
 
 function getWidgetForAllAudits(): v1.Widget[] {
-    const audits = coreMetrics.audits;
+    const audits = CORE_METRICS.audits;
 
     const widgetDefinitions: v1.Widget[] = audits.map(audit => {
         const title = formatAuditName(audit);
