@@ -25,6 +25,17 @@ function getWidget(title: string, type: string, requests: any[] = [], widgets: a
     }
 }
 
+function getWidgetForAllPageTypes(audit: string) {
+    const pageTypes = Object.keys(inspectList);
+
+    const widgetDefinitions = pageTypes.map(pageType => {
+        const requests = [];
+        return getWidget(pageType, 'timeseries', requests)
+    })
+
+    return widgetDefinitions
+}
+
 // Capitalize and replace dashes with space for audit names
 function replaceAndCapitalize(input: string): string {
     const words = input.split('-');
@@ -37,7 +48,8 @@ function getWidgetForAllAudits(): v1.Widget[] {
 
     const widgetDefinitions: v1.Widget[] = audits.map(audit => {
         const title = replaceAndCapitalize(audit);
-        return getWidget(title, 'group')
+        const widgets = getWidgetForAllPageTypes(audit);
+        return getWidget(title, 'group', [], widgets)
     })
 
     return widgetDefinitions
