@@ -9,6 +9,33 @@ const inspectList = JSON.parse(fs.readFileSync('urls.json', 'utf8'));
 const coreMetrics = JSON.parse(fs.readFileSync('metrics-config.json', 'utf8'));
 const host = 'ubreakit.com';
 
+// replace all - with _ and lowercase the variable name for Datadog query
+function formatDDQueryVar(audit: string): string {
+    return audit.replace(/-/g, '_').toLowerCase();
+}
+
+function getWidgetDefinitionRequests(audit: string, pageType: string) {
+    return [
+        {
+            responseFormat: "timeseries",
+            queries: [
+                {
+                    name: "query1",
+                    dataSource: "metrics",
+                    query: `avg:lighthouse.${formatDDQueryVar(audit)}{host:${host},page_type:${formatDDQueryVar(pageType)},$FormFactor} by {page_type,url,form_factor}`
+                },
+            ],
+            formulas: [ {formula: "query1"} ],
+            style: {
+                palette: "dog_classic",
+                lineType: "solid",
+                lineWidth: "normal",
+            },
+            displayType: "line",
+        },
+    ]
+}
+
 function getWidget(title: string, type: string, requests: any[] = [], widgets: any[] = [], markers: any[] = []) {
     return {
         definition: {
@@ -29,7 +56,7 @@ function getWidgetForAllPageTypes(audit: string) {
     const pageTypes = Object.keys(inspectList);
 
     const widgetDefinitions = pageTypes.map(pageType => {
-        const requests = [];
+        const requests = getWidgetDefinitionRequests(audit, pageType);
         return getWidget(pageType, 'timeseries', requests)
     })
 
