@@ -9,6 +9,45 @@ const inspectList = JSON.parse(fs.readFileSync('urls.json', 'utf8'));
 const coreMetrics = JSON.parse(fs.readFileSync('metrics-config.json', 'utf8'));
 const host = 'ubreakit.com';
 
+// Auditname -> {warning: "warning value", alert: "alert value"}
+const existingMarkers = {
+    'largest-contentful-paint': {
+        "warning": "2500 < y < 4000",
+        "alert": "y > 4000",
+    },
+    'first-contentful-paint': {
+        "warning": "1.8 < y < 3",
+        "alert": "y > 3",
+    },
+    'cumulative-layout-shift': {
+        "warning": "0.1 < y < 0.25",
+        "alert": "y > 0.25",
+    },
+    'total-blocking-time': {
+        "warning": "200 < y < 600",
+        "alert": "y > 600",
+    },
+    'speed-index': {
+        "warning": "3.4 < y < 5.8",
+        "alert": "y > 5.8",
+    },
+};
+
+function getMarkers(audit: string) {
+    return existingMarkers.hasOwnProperty(audit) ? [
+        {
+            "label": "Alert",
+            "value": existingMarkers[audit].alert,
+            "display_type": "error dashed"
+        },
+        {
+            "label": "Warning",
+            "value": existingMarkers[audit].warning,
+            "display_type": "warning dashed"
+        }
+    ] : []
+}
+
 // replace all - with _ and lowercase the variable name for Datadog query
 function formatDDQueryVar(audit: string): string {
     return audit.replace(/-/g, '_').toLowerCase();
@@ -54,10 +93,10 @@ function getWidget(title: string, type: string, requests: any[] = [], widgets: a
 
 function getWidgetForAllPageTypes(audit: string) {
     const pageTypes = Object.keys(inspectList);
-
+    const markers = getMarkers(audit);
     const widgetDefinitions = pageTypes.map(pageType => {
         const requests = getWidgetDefinitionRequests(audit, pageType);
-        return getWidget(pageType, 'timeseries', requests)
+        return getWidget(pageType, 'timeseries', requests, [], markers)
     })
 
     return widgetDefinitions
@@ -81,7 +120,6 @@ function getWidgetForAllAudits(): v1.Widget[] {
 
     return widgetDefinitions
 }
-
 
 function getDashboardsApiBody(): v1.DashboardsApiCreateDashboardRequest {
     return {
