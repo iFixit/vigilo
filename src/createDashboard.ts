@@ -5,6 +5,30 @@ import fs from 'node:fs'
 
 dotenv.config();
 
+type WidgetDefinition = {
+    title: string,
+    titleSize: string,
+    titleAlign: string,
+    showLegend: boolean,
+    type: string,
+    layoutType: string,
+    requests: any[],
+    widgets: any[],
+    markers: any[]
+}
+
+const defaultWidgetDefinition: WidgetDefinition = {
+    title: "",
+    titleSize: "16",
+    titleAlign: "left",
+    showLegend: true,
+    type: "timeseries",
+    layoutType: "ordered",
+    requests: [],
+    widgets: [],
+    markers: []
+}
+
 const inspectList = JSON.parse(fs.readFileSync('urls.json', 'utf8'));
 const coreMetrics = JSON.parse(fs.readFileSync('metrics-config.json', 'utf8'));
 const host = 'ubreakit.com';
@@ -75,19 +99,9 @@ function createWidgetRequestsForMetric(audit: string, pageType: string) {
     ]
 }
 
-function createWidget(title: string, type: string, requests: any[] = [], childWidgets: any[] = [], alertMarkers: any[] = []) {
+function createWidget(widget: Partial<WidgetDefinition>) {
     return {
-        definition: {
-            title: title,
-            titleSize: "16",
-            titleAlign: "left",
-            showLegend: false,
-            type: type,
-            layoutType: "ordered",
-            requests: requests,
-            widgets: childWidgets,
-            markers: alertMarkers,
-        }
+        definition: {...defaultWidgetDefinition, ...widget}
     }
 }
 
@@ -96,7 +110,7 @@ function createWidgetsForAllPageTypes(audit: string) {
     const markers = fetchAlertMarkersForAudit(audit);
     const widgetDefinitions = pageTypes.map(pageType => {
         const requests = createWidgetRequestsForMetric(audit, pageType);
-        return createWidget(pageType, 'timeseries', requests, [], markers)
+        return createWidget({title: pageType, requests: requests, markers: markers})
     })
 
     return widgetDefinitions
@@ -115,7 +129,7 @@ function getWidgetForAllAudits(): v1.Widget[] {
     const widgetDefinitions: v1.Widget[] = audits.map(audit => {
         const title = formatAuditName(audit);
         const widgets = createWidgetsForAllPageTypes(audit);
-        return createWidget(title, 'group', [], widgets)
+        return createWidget({title: title, type: 'group', widgets: widgets})
     })
 
     return widgetDefinitions
