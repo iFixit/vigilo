@@ -134,7 +134,7 @@ function getDashboardsApiBody(): v1.DashboardsApiCreateDashboardRequest {
                 },
             ],
             layoutType: "ordered",
-            widgets: getWidgetForAllAudits() as v1.Widget[],
+            widgets: getWidgetForAllAudits(),
         }
     }
 }
