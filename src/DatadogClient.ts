@@ -1,4 +1,4 @@
-import { client, v2 } from '@datadog/datadog-api-client';
+import { client, v1, v2 } from '@datadog/datadog-api-client';
 
 
 export default class DatadogClient {
@@ -35,6 +35,19 @@ export default class DatadogClient {
 
         if (response.errors?.length) {
             throw new Error(response.errors.join(', '));
+        }
+    }
+
+    async createDashboard(params: v1.DashboardsApiCreateDashboardRequest): Promise<void> {
+        const dashboardsApiInstance = new v1.DashboardsApi(this.clientConfiguration);
+
+        try {
+            const data = await dashboardsApiInstance.createDashboard(params);
+            console.log("Temporary dashboard created at: https://app.datadoghq.com/dashboard/" + data.id);
+            console.log("Copy the newly added audit/graph and paste it in the Lighthouse Dashboard list.");
+            console.log("Then delete the temporary dashboard.");
+        } catch (error) {
+            console.error(error);
         }
     }
 }
