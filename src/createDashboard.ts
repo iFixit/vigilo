@@ -1,7 +1,7 @@
 import Datadog from "./DatadogClient.js"
 import dotenv from 'dotenv'
 import { v1 } from '@datadog/datadog-api-client'
-import fs from 'node:fs'
+import { readJsonFile, formatAuditName, formatMetricNameForDatadog } from './utils.js'
 
 dotenv.config();
 
@@ -32,8 +32,8 @@ const defaultWidgetDefinition: WidgetDefinition = {
 const URLS_FILE_PATH = 'urls.json';
 const METRICS_CONFIG_PATH = 'metrics-config.json';
 const HOST = 'ubreakit.com';
-const INSPECT_LIST = JSON.parse(fs.readFileSync(URLS_FILE_PATH, 'utf8'));
-const CORE_METRICS = JSON.parse(fs.readFileSync(METRICS_CONFIG_PATH, 'utf8'));
+const INSPECT_LIST = readJsonFile(URLS_FILE_PATH);
+const CORE_METRICS = readJsonFile(METRICS_CONFIG_PATH);
 
 // Auditname -> {warning: "warning value", alert: "alert value"}
 const ALERT_MARKERS = {
@@ -74,11 +74,6 @@ function fetchAlertMarkersForAudit(auditName: string) {
     ] : []
 }
 
-// replace all - with _ and lowercase the metricName for Datadog query
-function formatMetricNameForDatadog(metricName: string): string {
-    return metricName.replace(/-/g, '_').toLowerCase();
-}
-
 function createWidgetRequestsForMetric(audit: string, pageType: string) {
     return [
         {
@@ -117,13 +112,6 @@ function createWidgetsForAllPageTypes(audit: string) {
 
     return widgetDefinitions
 }
-
-// Capitalize and replace dashes with space for audit names
-function formatAuditName(input: string): string {
-    const words = input.split('-');
-    const capitalizedWords = words.map(word => word.charAt(0).toUpperCase() + word.slice(1));
-    return capitalizedWords.join(' ');
-  }
 
 function getWidgetForAllAudits(): v1.Widget[] {
     const audits = CORE_METRICS.audits;
