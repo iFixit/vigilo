@@ -104,10 +104,10 @@ function createWidget(widget: Partial<WidgetDefinition>) {
 
 function createWidgetsForAllPageTypes(audit: string) {
     const pageTypes = Object.keys(INSPECT_LIST);
-    const markers = fetchAlertMarkersForAudit(audit);
+    const alertMarkers = fetchAlertMarkersForAudit(audit);
     const widgetDefinitions = pageTypes.map(pageType => {
         const requests = createWidgetRequestsForMetric(audit, pageType);
-        return createWidget({title: pageType, requests: requests, markers: markers})
+        return createWidget({title: pageType, requests: requests, markers: alertMarkers})
     })
 
     return widgetDefinitions
@@ -118,8 +118,8 @@ function getWidgetForAllAudits(): v1.Widget[] {
 
     const widgetDefinitions: v1.Widget[] = audits.map(audit => {
         const title = formatAuditName(audit);
-        const widgets = createWidgetsForAllPageTypes(audit);
-        return createWidget({title: title, type: 'group', widgets: widgets})
+        const childWidgets = createWidgetsForAllPageTypes(audit);
+        return createWidget({title: title, type: 'group', widgets: childWidgets})
     })
 
     return widgetDefinitions
