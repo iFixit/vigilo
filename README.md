@@ -31,6 +31,14 @@ google-chrome --version
 #### Local Usage
 1. After setup, run `pnpm start` to run vigilo and send metrics to Datadog
 
+#### Generate Dashboards in Datadog
+1. After setup, run `pnpm run create-dashboard` to create temporary dashboard in Datadog.
+2. Copy the newly created section in the temporary dashboard.
+3. Paste it in the existing `Lighthouse Reports` dashboard.
+4. Delete the temporary dashboard.
+
+This is useful when there were changes to the config files (`metrics-config.json`, and `url.json`) and we want to create the dashboards for the new `audits`/`page types`.
+
 ### Docker Setup
 
 1. Clone the repo
