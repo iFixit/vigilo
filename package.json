@@ -21,12 +21,14 @@
   "devDependencies": {
     "@tsconfig/node18": "^18.2.1",
     "@types/node": "^20.5.9",
+    "@types/yargs": "^17.0.28",
     "typescript": "^5.2.2"
   },
   "dependencies": {
     "@datadog/datadog-api-client": "^1.16.0",
     "dotenv": "^16.3.1",
     "lighthouse": "^11.1.0",
-    "puppeteer": "^21.2.1"
+    "puppeteer": "^21.2.1",
+    "yargs": "^17.7.2"
   }
 }

@@ -17,6 +17,9 @@ dependencies:
   puppeteer:
     specifier: ^21.2.1
     version: 21.2.1(typescript@5.2.2)
+  yargs:
+    specifier: ^17.7.2
+    version: 17.7.2
 
 devDependencies:
   '@tsconfig/node18':
@@ -25,6 +28,9 @@ devDependencies:
   '@types/node':
     specifier: ^20.5.9
     version: 20.5.9
+  '@types/yargs':
+    specifier: ^17.0.28
+    version: 17.0.28
   typescript:
     specifier: ^5.2.2
     version: 5.2.2
@@ -181,6 +187,16 @@ packages:
   /@types/pako@1.0.4:
     resolution: {integrity: sha512-Z+5bJSm28EXBSUJEgx29ioWeEEHUh6TiMkZHDhLwjc9wVFH+ressbkmX6waUZc5R3Gobn4Qu5llGxaoflZ+yhA==}
     dev: false
+
+  /@types/yargs-parser@21.0.1:
+    resolution: {integrity: sha512-axdPBuLuEJt0c4yI5OZssC19K2Mq1uKdrfZBzuxLvaztgqUtFYZUNw7lETExPYJR9jdEoIg4mb7RQKRQzOkeGQ==}
+    dev: true
+
+  /@types/yargs@17.0.28:
+    resolution: {integrity: sha512-N3e3fkS86hNhtk6BEnc0rj3zcehaxx8QWhCROJkqpl5Zaoi7nAic3jH8q94jVD3zu5LGk+PUB6KAiDmimYOEQw==}
+    dependencies:
+      '@types/yargs-parser': 21.0.1
+    dev: true
 
   /@types/yauzl@2.10.0:
     resolution: {integrity: sha512-Cn6WYCm0tXv8p6k+A8PvbDG763EDpBoTzHdA+Q/MF6H3sapGjCm9NzoaJncJS9tUKSuCoDs9XHxYYsQDgxR6kw==}
