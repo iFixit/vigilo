@@ -27,6 +27,7 @@ const argv = yargs(process.argv.slice(2)).options(
             description: 'Datadog metric description.'
         },
     })
+    .strict()
     .parseSync();
 
 const auditName =  argv.auditName
