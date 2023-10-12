@@ -15,6 +15,9 @@ function getAuditNumericValue(results: Result, audit: string): number {
 }
 
 function getAuditNumericUnitType(results: Result, audit: string): string {
+    if (results.audits[audit].numericUnit === 'unitless') {
+        return 'unit'
+    }
     return results.audits[audit].numericUnit || 'unit'
 }
 
