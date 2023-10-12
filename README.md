@@ -39,6 +39,10 @@ google-chrome --version
 
 This is useful when there were changes to the config files (`metrics-config.json`, and `url.json`) and we want to create the dashboards for the new `audits`/`page types`.
 
+#### Updating Metadata of Metrics in Datadog
+1. After setup, run `pnpm run update-metric-metadata` to use the CLI tool to update the metadata of the metrics in Datadog.
+2. The CLI tool will give you a list of options to pass as well as information on how to use the tool.
+
 ### Docker Setup
 
 1. Clone the repo
