@@ -2,6 +2,7 @@ import yargs from 'yargs'
 import { v1 } from '@datadog/datadog-api-client';
 import Datadog from "./DatadogClient.js"
 import dotenv from 'dotenv'
+import { formatMetricNameForDatadog } from './utils.js';
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ const argv = yargs(process.argv.slice(2)).options(
             type: 'string',
             demandOption: true,
             description: 'Lighthouse audit name to update.',
+            coerce: (auditName: string) => formatMetricNameForDatadog(auditName)
         },
         auditType: {
             type: 'string',
