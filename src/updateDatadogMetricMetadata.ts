@@ -6,14 +6,14 @@ import { formatMetricNameForDatadog } from './utils.js';
 
 dotenv.config();
 
-async function updateDatadogMetric(auditName: string, auditType: 'score' | 'value',  metaData: v1.MetricMetadata) {
+async function updateDatadogMetric(auditName: string, auditType: 'score' | 'value',  metadata: v1.MetricMetadata) {
     const dd = new Datadog({
         api_key: process.env.DD_API_KEY || '',
         app_key: process.env.DD_APP_KEY || ''
     })
 
     const metricName = `lighthouse.${auditName}.${auditType}`;
-    await dd.updateMetricMetadata(metricName, metaData);
+    await dd.updateMetricMetadata(metricName, metadata);
 }
 
 const argv = yargs(process.argv.slice(2)).options(
@@ -49,10 +49,10 @@ const argv = yargs(process.argv.slice(2)).options(
 
 const auditName =  argv.auditName
 const auditType = argv.auditType as 'score' | 'value'
-const metaData = {
+const metadata = {
     unit: argv.unit,
     type: argv.type as 'gauge' | 'count' | 'rate',
     description: argv.description
 };
 
-await updateDatadogMetric(auditName, auditType, metaData);
+await updateDatadogMetric(auditName, auditType, metadata);

@@ -43,13 +43,13 @@ export default class DatadogClient {
      * @note The v1 MetricMetadata type is not compatible with the v2 MetricSeries
      * Metadata type. Ensure that only the v1 MetricMetadata type is used.
      */
-    async updateMetricMetadata(metricName: string, metaData: v1.MetricMetadata): Promise<void> {
+    async updateMetricMetadata(metricName: string, metadata: v1.MetricMetadata): Promise<void> {
         const metricsApiInstance = new v1.MetricsApi(this.clientConfiguration);
 
         const params: v1.MetricsApiUpdateMetricMetadataRequest = {
             metricName,
             body: {
-                ...metaData
+                ...metadata
             }
         };
 
