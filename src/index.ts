@@ -1,7 +1,7 @@
 import BrowserRunner from "./BrowserRunner.js"
 import LighthouseRunner from "./LighthouseRunner.js"
 import Datadog from "./DatadogClient.js"
-import {v2} from '@datadog/datadog-api-client'
+import {v1, v2} from '@datadog/datadog-api-client'
 import fs from 'node:fs'
 import os from 'node:os'
 import type { Flags, Result, Config } from 'lighthouse'
@@ -14,8 +14,19 @@ function getAuditNumericValue(results: Result, audit: string): number {
     return results.audits[audit].numericValue || 0
 }
 
+function getAuditNumericUnitType(results: Result, audit: string): string {
+    if (results.audits[audit].numericUnit === 'unitless') {
+        return 'unit'
+    }
+    return results.audits[audit].numericUnit || 'unit'
+}
+
 function getAuditScore(results: Result, audit: string): number {
     return results.audits[audit].score || 0
+}
+
+function getAuditDescription(results: Result, audit: string): string {
+    return results.audits[audit].description || ''
 }
 
 function getFetchTime(results: Result): number {
@@ -24,17 +35,23 @@ function getFetchTime(results: Result): number {
 
 function retrieveDataPointsForAudits(results: Result, audits: string[]) {
     const timestamp = getFetchTime(results)
-    const values: Record<string, Record<string, v2.MetricPoint>> = {}
+    const values = {}
 
     for (let audit of audits) {
         values[audit] = {
-            "numericValue": {
-                timestamp: timestamp,
-                value: getAuditNumericValue(results, audit)
+            "dataPoints" : {
+                "numericValue": {
+                    timestamp: timestamp,
+                    value: getAuditNumericValue(results, audit)
+                },
+                "score": {
+                    timestamp: timestamp,
+                    value: getAuditScore(results, audit)
+                }
             },
-            "score": {
-                timestamp: timestamp,
-                value: getAuditScore(results, audit)
+            "metadata": {
+                "unit": getAuditNumericUnitType(results, audit),
+                "description": getAuditDescription(results, audit)
             }
         }
     }
@@ -60,7 +77,7 @@ function addRandomParamToUrl(inspectList: Record<string, string[]>): Record<stri
     return updatedInspectList;
 }
 
-async function sendMetricsToDatadog(metricName: string, dataPoints: v2.MetricPoint[], tags: Record<string, string>) {
+async function sendMetricsToDatadog(metricName: string, dataPoints: v2.MetricPoint[], tags: Record<string, string>, metadata?: v1.MetricMetadata) {
     const dd = new Datadog({
         api_key: process.env.DD_API_KEY || '',
         app_key: process.env.DD_APP_KEY || ''
@@ -68,6 +85,10 @@ async function sendMetricsToDatadog(metricName: string, dataPoints: v2.MetricPoi
     const tagsArray = Object.entries(tags).map(([key, value]) => `${key}:${value}`)
 
     await dd.submitMetrics(metricName, dataPoints, tagsArray)
+
+    if(metadata) {
+        await dd.updateMetricMetadata(metricName, metadata)
+    }
 }
 
 async function captureLighthouseMetrics(pageType: string, url: string, audits: string[], options: Flags = {}, config: Config = {}) {
@@ -95,10 +116,15 @@ async function captureLighthouseMetrics(pageType: string, url: string, audits: s
     }
 
     console.log(`Sending metrics to Datadog for ${url}`)
-    for (let [audit, dataPoints] of Object.entries(metrics)) {
-        await sendMetricsToDatadog(`lighthouse.${audit}.value`, [dataPoints.numericValue], tags)
-        await sendMetricsToDatadog(`lighthouse.${audit}.score`, [dataPoints.score], tags)
+
+    for (const audit of Object.keys(metrics)) {
+        const {dataPoints, metadata} = metrics[audit];
+
+        await sendMetricsToDatadog(`lighthouse.${audit}.value`, [dataPoints.numericValue], tags, metadata)
+
+        await sendMetricsToDatadog(`lighthouse.${audit}.score`, [dataPoints.score], tags, {...metadata, unit: 'unit'})
     }
+
     console.log(`Done sending metrics to Datadog for ${url}`)
 
     console.log(`Done running Lighthouse for ${url} with form factor: ${formFactor}\n`);
