@@ -5,6 +5,7 @@ import {v1, v2} from '@datadog/datadog-api-client'
 import fs from 'node:fs'
 import os from 'node:os'
 import type { Flags, Result, Config } from 'lighthouse'
+import lhConfig from '../lh-config.js';
 import lhDesktopConfig from 'lighthouse/core/config/lr-desktop-config.js'
 import lhMobileConfig from 'lighthouse/core/config/lr-mobile-config.js'
 import dotenv from 'dotenv'
@@ -133,15 +134,15 @@ async function captureLighthouseMetrics(pageType: string, url: string, audits: s
     let inspectList: Record<string, string[]> = JSON.parse(await fs.promises.readFile('urls.json', 'utf8'));
     inspectList = addRandomParamToUrl(inspectList);
 
-    const coreMetrics: Record<string, string[]> = JSON.parse(await fs.promises.readFile('metrics-config.json', 'utf8'));
+    const audits = lhConfig.settings.onlyAudits || []
 
     for (let [pageType, urls] of Object.entries(inspectList)) {
         console.log(`Capturing metrics for ${pageType} page(s)\n`)
 
         for (let url of urls) {
-            await captureLighthouseMetrics(pageType, url, coreMetrics.audits, {}, lhDesktopConfig)
+            await captureLighthouseMetrics(pageType, url, audits, {}, lhDesktopConfig)
 
-            await captureLighthouseMetrics(pageType, url, coreMetrics.audits, {}, lhMobileConfig)
+            await captureLighthouseMetrics(pageType, url, audits, {}, lhMobileConfig)
         }
 
         console.log(`Done capturing metrics for ${pageType} page(s)\n`)
