@@ -15,3 +15,23 @@ export function formatAuditName(input: string): string {
     const capitalizedWords = words.map(word => word.charAt(0).toUpperCase() + word.slice(1));
     return capitalizedWords.join(' ');
 }
+
+// Merge two objects, preserving nested objects
+export function deepMerge(target: any, source: any) {
+    const isObject = (item: any) => item && typeof item === 'object' && !Array.isArray(item);
+
+    let output = Object.assign({}, target);
+    if (isObject(target) && isObject(source)) {
+      Object.keys(source).forEach(key => {
+        if (isObject(source[key])) {
+          if (!(key in target))
+            Object.assign(output, { [key]: source[key] });
+          else
+            output[key] = deepMerge(target[key], source[key]);
+        } else {
+          Object.assign(output, { [key]: source[key] });
+        }
+      });
+    }
+    return output;
+}
