@@ -32,7 +32,7 @@ node_modules/
 
 # Config Files
 urls.json
-metrics-config.json
+lh-config.js
 
 # TSC Output
 dist
