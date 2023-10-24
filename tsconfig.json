@@ -5,9 +5,8 @@
     "removeComments": true, /* Remove comments */
     "sourceMap": true,  /* Generates corresponding '.map' file. */
     "outDir": "dist",
-    "rootDir": "src",
     "declaration": true, /* Generates corresponding '.d.ts' file. */
     "noImplicitAny": false,
   },
-  "include" : ["src/**/*"]
+  "include" : ["src/**/*", "lh-config.js"]
 }

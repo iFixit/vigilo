@@ -1,39 +1,23 @@
 import Datadog from "./DatadogClient.js"
 import dotenv from 'dotenv'
 import { v1 } from '@datadog/datadog-api-client'
+import lhConfig from "../lh-config.js"
 import { readJsonFile, formatAuditName, formatMetricNameForDatadog } from './utils.js'
 
 dotenv.config();
 
-type WidgetDefinition = {
-    title: string,
-    titleSize: string,
-    titleAlign: string,
-    showLegend: boolean,
-    type: string,
-    layoutType: string,
-    requests: any[],
-    widgets: any[],
-    markers: any[]
+type GroupWidgetDefinition = Partial<v1.GroupWidgetDefinition> & {
+    widgets: v1.Widget[]
 }
 
-const defaultWidgetDefinition: WidgetDefinition = {
-    title: "",
-    titleSize: "16",
-    titleAlign: "left",
-    showLegend: true,
-    type: "timeseries",
-    layoutType: "ordered",
-    requests: [],
-    widgets: [],
-    markers: []
+type TimeseriesWidgetDefinition = Partial<v1.TimeseriesWidgetDefinition> & {
+    requests: v1.TimeseriesWidgetRequest[]
 }
 
 const URLS_FILE_PATH = 'urls.json';
-const METRICS_CONFIG_PATH = 'metrics-config.json';
 const HOST = 'ubreakit.com';
 const INSPECT_LIST = readJsonFile(URLS_FILE_PATH);
-const CORE_METRICS = readJsonFile(METRICS_CONFIG_PATH);
+const AUDITS = lhConfig.settings.onlyAudits || [];
 
 // Auditname -> {warning: "warning value", alert: "alert value"}
 const ALERT_MARKERS = {
@@ -74,7 +58,7 @@ function fetchAlertMarkersForAudit(auditName: string) {
     ] : []
 }
 
-function createWidgetRequestsForMetric(audit: string, pageType: string) {
+function createWidgetRequestsForMetric(audit: string, pageType: string): v1.TimeseriesWidgetRequest[] {
     return [
         {
             responseFormat: "timeseries",
@@ -96,30 +80,48 @@ function createWidgetRequestsForMetric(audit: string, pageType: string) {
     ]
 }
 
-function createWidget(widget: Partial<WidgetDefinition>) {
+function createTimeseriesWidget(widget: TimeseriesWidgetDefinition): v1.Widget {
+
     return {
-        definition: {...defaultWidgetDefinition, ...widget}
+        definition: {
+            title: "",
+            titleSize: "16",
+            titleAlign: "left",
+            type: "timeseries",
+            showLegend: true,
+            ...widget
+        }
     }
 }
 
-function createWidgetsForAllPageTypes(audit: string) {
+function createGroupWidget(widget: GroupWidgetDefinition): v1.Widget {
+    return {
+        definition: {
+            title: "",
+            titleAlign: "left",
+            type: "group",
+            layoutType: "ordered",
+            ...widget
+        }
+    }
+}
+
+function createTimeseriesWidgetsForAllPageTypes(audit: string): v1.Widget[] {
     const pageTypes = Object.keys(INSPECT_LIST);
     const alertMarkers = fetchAlertMarkersForAudit(audit);
     const widgetDefinitions = pageTypes.map(pageType => {
         const requests = createWidgetRequestsForMetric(audit, pageType);
-        return createWidget({title: pageType, requests: requests, markers: alertMarkers})
+        return createTimeseriesWidget({title: pageType, requests: requests, markers: alertMarkers})
     })
 
     return widgetDefinitions
 }
 
 function getWidgetForAllAudits(): v1.Widget[] {
-    const audits = CORE_METRICS.audits;
-
-    const widgetDefinitions: v1.Widget[] = audits.map(audit => {
+    const widgetDefinitions: v1.Widget[] = AUDITS.map(audit => {
         const title = formatAuditName(audit);
-        const childWidgets = createWidgetsForAllPageTypes(audit);
-        return createWidget({title: title, type: 'group', widgets: childWidgets})
+        const childWidgets = createTimeseriesWidgetsForAllPageTypes(audit);
+        return createGroupWidget({title: title, widgets: childWidgets})
     })
 
     return widgetDefinitions

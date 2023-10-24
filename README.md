@@ -6,13 +6,13 @@ Vigilo is a monitoring tool that automates Lighthouse audits and sends key metri
 ### Local Setup
 1. Clone the repo
 2. Run `pnpm install`
-3. Run `pnpm run build`
-4. Run `cp .env.template .env`
-5. Add your Datadog API key and Datadog Application key to the `.env` file
-6. Run `cp urls.example.json urls.json`
-7. Add your URLs to the `urls.json` file
-8. Run `cp metrics-config.example.json metrics-config.json`
-9. Add the metrics you want to send to Datadog to the `metrics.json` file
+3. Run `cp lh-config.example.js lh-config.js`
+4. Add the metrics you want to track to the `onlyAudits` property in the `lh-config.js` file
+5. Run `pnpm run build`
+6. Run `cp .env.template .env`
+7. Add your Datadog API key and Datadog Application key to the `.env` file
+8. Run `cp urls.example.json urls.json`
+9. Add your URLs to the `urls.json` file
 
 ⚠️ If you are setting this up on a Windows machine via WSL, then you will need to run the following commands to ensure the correct linux dependencies are installed:
 **Make sure dependencies are up to date**
@@ -37,7 +37,7 @@ google-chrome --version
 3. Paste it in the existing `Lighthouse Reports` dashboard.
 4. Delete the temporary dashboard.
 
-This is useful when there were changes to the config files (`metrics-config.json`, and `url.json`) and we want to create the dashboards for the new `audits`/`page types`.
+This is useful when there were changes to the config files (`lh-config.js`, and `url.json`) and we want to create the dashboards for the new `audits`/`page types`.
 
 #### Updating Metadata of Metrics in Datadog
 1. After setup, run `pnpm run update-metric-metadata` to use the CLI tool to update the metadata of the metrics in Datadog.
@@ -50,8 +50,8 @@ This is useful when there were changes to the config files (`metrics-config.json
 3. Add your Datadog API key and Datadog Application key to the `.env` file
 4. Run `cp urls.example.json urls.json`
 5. Add your URLs to the `urls.json` file
-6. Run `cp metrics-config.example.json metrics-config.json`
-7. Add the metrics you want to send to Datadog to the `metrics.json` file
+6. Run `cp lh-config.example.js lh-config.js`
+7. Add the metrics you want to track to the `onlyAudits` property in the `lh-config.js` file
 8. Run `docker build -t vigilo .`
 
 #### Docker Usage
