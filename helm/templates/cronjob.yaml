@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: hello
+  name: vigilo
 spec:
   schedule: "*/1 * * * *" # every minute
   concurrencyPolicy: Forbid # skip if previous job is still running
@@ -12,11 +12,9 @@ spec:
       template:
         spec:
           containers:
-          - name: hello
-            image: busybox:1.28
+          - name: vigilo
+            image: registry.seraphinus.dev/vigilo:latest
+            imagePullSecrets:
+              - name: regcred
             imagePullPolicy: IfNotPresent
-            command:
-            - /bin/sh
-            - -c
-            - date; echo Hello from the Kubernetes cluster
           restartPolicy: OnFailure
