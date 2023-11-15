@@ -1,9 +1,9 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: vigilo
+  name: vigilo-cron
 spec:
-  schedule: "*/1 * * * *" # every minute
+  schedule: "*/10 * * * *" # every minute
   concurrencyPolicy: Forbid # skip if previous job is still running
   successfulJobsHistoryLimit: 0 # keep no history of successful jobs
   failedJobsHistoryLimit: 1 # keep only one failed job
@@ -11,10 +11,18 @@ spec:
     spec:
       template:
         spec:
+          volumes:
+            - name: urls-volume
+              configMap:
+                name: vigilo-urls
           containers:
           - name: vigilo
             image: registry.seraphinus.dev/vigilo:latest
             imagePullPolicy: IfNotPresent
+            volumeMounts:
+              - name: urls-volume
+                mountPath: ./app/urls.json
+                subPath: urls.json
           imagePullSecrets:
             - name: regcred
           restartPolicy: OnFailure

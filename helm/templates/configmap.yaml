@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vigilo-urls
+data:
+  urls.json: |
+    {{- toJson .Values.urls | nindent 6 }}
