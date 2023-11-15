@@ -27,7 +27,7 @@ spec:
                 mountPath: ./app/urls.json
                 subPath: urls.json
               - name: lh-config-volume
-                mountPath: ./app/dist/lh-config.js
+                mountPath: ./app/lh-config.js
                 subPath: lh-config.js
           imagePullSecrets:
             - name: regcred
