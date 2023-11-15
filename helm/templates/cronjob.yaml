@@ -21,7 +21,7 @@ spec:
           containers:
           - name: vigilo
             image: registry.seraphinus.dev/vigilo:latest
-            imagePullPolicy: IfNotPresent
+            imagePullPolicy: Always
             volumeMounts:
               - name: urls-volume
                 mountPath: ./app/urls.json
