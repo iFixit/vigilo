@@ -22,6 +22,7 @@ lhConfig: |
 existingDatadogSecret: ""
 
 # Pass base64 encoded values for apiKey and appKey
+# echo -n "<KEY>" | base64
 datadogSecret:
   secretName:
   apiKey:
