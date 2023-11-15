@@ -18,3 +18,11 @@ lhConfig: |
           ]
       }
   }
+
+existingDatadogSecret: ""
+
+# Pass base64 encoded values for apiKey and appKey
+datadogSecret:
+  secretName:
+  apiKey:
+  appKey:
