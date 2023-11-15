@@ -15,6 +15,9 @@ spec:
             - name: urls-volume
               configMap:
                 name: vigilo-urls
+            - name: lh-config-volume
+              configMap:
+                name: vigilo-lh-config
           containers:
           - name: vigilo
             image: registry.seraphinus.dev/vigilo:latest
@@ -23,6 +26,9 @@ spec:
               - name: urls-volume
                 mountPath: ./app/urls.json
                 subPath: urls.json
+              - name: lh-config-volume
+                mountPath: ./app/dist/lh-config.js
+                subPath: lh-config.js
           imagePullSecrets:
             - name: regcred
           restartPolicy: OnFailure
