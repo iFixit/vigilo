@@ -1,12 +1,13 @@
 {
   "extends": "@tsconfig/node18/tsconfig.json",
   "compilerOptions": {
-    "allowJs": true,
+    "allowJs": false,
     "removeComments": true, /* Remove comments */
     "sourceMap": true,  /* Generates corresponding '.map' file. */
     "outDir": "dist",
+    "rootDir": "src",
     "declaration": true, /* Generates corresponding '.d.ts' file. */
     "noImplicitAny": false,
   },
-  "include" : ["src/**/*", "lh-config.js"]
+  "include" : ["src/**/*"]
 }
