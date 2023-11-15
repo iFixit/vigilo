@@ -14,7 +14,7 @@ spec:
           containers:
           - name: vigilo
             image: registry.seraphinus.dev/vigilo:latest
-            imagePullSecrets:
-              - name: regcred
             imagePullPolicy: IfNotPresent
+          imagePullSecrets:
+            - name: regcred
           restartPolicy: OnFailure
