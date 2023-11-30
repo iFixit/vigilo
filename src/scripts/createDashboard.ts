@@ -1,8 +1,8 @@
-import Datadog from "./DatadogClient.js"
+import Datadog from "@core/DatadogClient.js"
 import dotenv from 'dotenv'
 import { v1 } from '@datadog/datadog-api-client'
-import lhConfig from "../lh-config.js"
-import { readJsonFile, formatAuditName, formatMetricNameForDatadog } from './utils.js'
+import lhConfig from "@config/lh-config.js"
+import { readJsonFile, formatAuditName, formatMetricNameForDatadog } from '@core/utils.js'
 
 dotenv.config();
 

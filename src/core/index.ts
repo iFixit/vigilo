@@ -5,7 +5,7 @@ import {v1, v2} from '@datadog/datadog-api-client'
 import fs from 'node:fs'
 import os from 'node:os'
 import type { Flags, Result, Config } from 'lighthouse'
-import lhConfig from '../lh-config.js';
+import lhConfig from '@config/lh-config.js';
 import lhDesktopConfig from 'lighthouse/core/config/lr-desktop-config.js'
 import lhMobileConfig from 'lighthouse/core/config/lr-mobile-config.js'
 import {deepMerge} from './utils.js'
