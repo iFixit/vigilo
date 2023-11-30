@@ -11,6 +11,7 @@
   "scripts": {
     "setup": "dev-scripts/setup.sh",
     "start": "node dist/index.js",
+    "start:docker": "dev-scripts/run-docker.sh",
     "create-dashboard": "pnpm build:scripts && node bin/createDashboard.js",
     "update-metric-metadata": "pnpm build:scripts && node bin/updateDatadogMetricMetadata.js",
     "clean": "rm -rf dist && rm -rf bin",
