@@ -1,8 +1,10 @@
 import { build as tsupBuild } from 'tsup';
+import { replaceTscAliasPaths } from 'tsc-alias';
 import yargs from 'yargs';
 
 const CORE_DIR = 'dist';
 const SCRIPTS_DIR = 'bin';
+const isDocker = process.env.DOCKER === 'true';
 
 const argv = yargs(process.argv.slice(2)).options({
   target: {
@@ -33,6 +35,7 @@ const config = {
   format: 'esm',
   silent: argv.silent,
   clean: argv.clean,
+  external: isDocker ? ['@config'] : [], // Don't resolve @config modules when building in docker
 }
 
 const CORE_BUILD = {
@@ -49,9 +52,29 @@ const SCRIPTS_BUILD = {
   entry: ['src/scripts/*'],
 }
 
+/**
+ * Resolve paths after the build process because ESBuild only supports path
+ * resolution natively during bundling.
+ *
+ * "@config/" paths are replaced with relative-path "./" to allow for
+ * non-bundling scenarios like Docker.
+ */
+async function replaceConfigAliasPaths(outDir) {
+    await replaceTscAliasPaths({
+      configFile: 'tsconfig.json',
+      outDir: outDir,
+      watch: false,
+      replacers: ['build.config-alias-replacer.cjs']
+    });
+  }
+
 async function build(buildConfig, buildTarget) {
   try {
     await tsupBuild(buildConfig);
+
+    if (isDocker) {
+      await replaceConfigAliasPaths(buildConfig.outDir);
+    }
   } catch (e) {
     console.error(`Failed to build ${buildTarget}:`, e);
     process.exit(1);
