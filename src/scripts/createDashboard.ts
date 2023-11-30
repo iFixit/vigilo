@@ -2,7 +2,8 @@ import Datadog from "@core/DatadogClient.js"
 import dotenv from 'dotenv'
 import { v1 } from '@datadog/datadog-api-client'
 import lhConfig from "@config/lh-config.js"
-import { readJsonFile, formatAuditName, formatMetricNameForDatadog } from '@core/utils.js'
+import URLS from "@config/urls.json"
+import { formatAuditName, formatMetricNameForDatadog } from '@core/utils.js'
 
 dotenv.config();
 
@@ -14,9 +15,8 @@ type TimeseriesWidgetDefinition = Partial<v1.TimeseriesWidgetDefinition> & {
     requests: v1.TimeseriesWidgetRequest[]
 }
 
-const URLS_FILE_PATH = 'urls.json';
 const HOST = 'ubreakit.com';
-const INSPECT_LIST = readJsonFile(URLS_FILE_PATH);
+const INSPECT_LIST = URLS;
 const AUDITS = lhConfig.settings.onlyAudits || [];
 
 // Auditname -> {warning: "warning value", alert: "alert value"}

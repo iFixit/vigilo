@@ -13,5 +13,6 @@
     "outDir": "dist",
     "declaration": true, /* Generates corresponding '.d.ts' file. */
     "noImplicitAny": false,
+    "resolveJsonModule": true
   },
 }
