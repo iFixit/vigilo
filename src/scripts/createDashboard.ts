@@ -2,7 +2,7 @@ import Datadog from "@core/DatadogClient.js"
 import dotenv from 'dotenv'
 import { v1 } from '@datadog/datadog-api-client'
 import lhConfig from "@config/lh-config.js"
-import URLS from "@config/urls.json"
+import URLS from "@config/urls.json" assert { type: "json" }
 import { formatAuditName, formatMetricNameForDatadog } from '@core/utils.js'
 
 dotenv.config();

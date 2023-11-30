@@ -6,7 +6,7 @@ import fs from 'node:fs'
 import os from 'node:os'
 import type { Flags, Result, Config } from 'lighthouse'
 import lhConfig from '@config/lh-config.js';
-import URLS from '@config/urls.json';
+import URLS from '@config/urls.json' assert { type: "json" };
 import lhDesktopConfig from 'lighthouse/core/config/lr-desktop-config.js'
 import lhMobileConfig from 'lighthouse/core/config/lr-mobile-config.js'
 import {deepMerge} from './utils.js'
