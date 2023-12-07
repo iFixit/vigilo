@@ -1,8 +1,8 @@
 import yargs from 'yargs'
 import { v1 } from '@datadog/datadog-api-client';
-import Datadog from "./DatadogClient.js"
+import Datadog from "@core/DatadogClient.js"
 import dotenv from 'dotenv'
-import { formatMetricNameForDatadog } from './utils.js';
+import { formatMetricNameForDatadog } from '../core/utils.js';
 
 dotenv.config();
 

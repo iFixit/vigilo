@@ -1,20 +1,23 @@
 {
   "name": "vigilo",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Vigilo is a monitoring tool that automates Lighthouse audits and sends key metrics to Datadog. Designed to keep a vigilant eye on your web application's performance and accessibility.",
-  "main": "dist/src/index.js",
+  "main": "dist/index.js",
   "repository": "https://github.com/iFixit/vigilo.git",
   "type": "module",
   "engines": {
     "node": ">=18.0.0"
   },
   "scripts": {
-    "start": "node dist/src/index.js",
-    "create-dashboard": "pnpm build && node dist/src/createDashboard.js",
-    "update-metric-metadata": "node dist/src/updateDatadogMetricMetadata.js",
-    "clean": "rm -rf dist",
-    "build": "pnpm clean && tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "setup": "dev-scripts/setup.sh",
+    "start": "node dist/index.js",
+    "start:docker": "dev-scripts/run-docker.sh",
+    "create-dashboard": "pnpm build:scripts && node bin/createDashboard.js",
+    "update-metric-metadata": "pnpm build:scripts && node bin/updateDatadogMetricMetadata.js",
+    "clean": "rm -rf dist && rm -rf bin",
+    "build": "pnpm clean && node build.js",
+    "build:core": "node build.js --target=core",
+    "build:scripts": "node build.js --target=scripts"
   },
   "keywords": [],
   "author": "Angel de la Torre <angel.dlt.1996@gmail.com>",
@@ -23,6 +26,8 @@
     "@tsconfig/node18": "^18.2.1",
     "@types/node": "^20.5.9",
     "@types/yargs": "^17.0.28",
+    "tsc-alias": "^1.8.8",
+    "tsup": "^8.0.1",
     "typescript": "^5.2.2"
   },
   "dependencies": {

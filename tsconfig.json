@@ -1,12 +1,20 @@
 {
   "extends": "@tsconfig/node18/tsconfig.json",
   "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "baseUrl": ".",
+    "paths": {
+      "@core/*": ["src/core/*"],
+      "@config/*": ["src/config/*"],
+      "@scripts/*": ["src/scripts/*"],
+    },
     "allowJs": true,
     "removeComments": true, /* Remove comments */
     "sourceMap": true,  /* Generates corresponding '.map' file. */
     "outDir": "dist",
     "declaration": true, /* Generates corresponding '.d.ts' file. */
     "noImplicitAny": false,
+    "resolveJsonModule": true
   },
-  "include" : ["src/**/*", "lh-config.js"]
 }

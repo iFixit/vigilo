@@ -36,3 +36,4 @@ lh-config.js
 
 # TSC Output
 dist
+bin
