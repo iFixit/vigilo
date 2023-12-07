@@ -1,0 +1,39 @@
+name: Build Vigilo image and push to ECR
+on:
+   push:
+      branches:
+        - main
+
+jobs:
+   build_image:
+      name: Build Vigilo image and push to ECR
+      runs-on: ubuntu-latest
+      permissions:
+        id-token: write
+        contents: read
+
+      steps:
+       - name: Checkout
+         uses: actions/checkout@v3
+
+       - name: Configure AWS credentials
+         uses: aws-actions/configure-aws-credentials@v2
+         with:
+            role-to-assume: ${{ secrets.DEPLOY_IAM_ROLE }}
+            aws-region: us-east-1
+
+       - name: Login to Amazon ECR
+         id: login-ecr
+         uses: aws-actions/amazon-ecr-login@v1
+
+       - name: Build, Tag, and Push Image to Amazon ECR
+         env:
+           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+           REPOSITORY: vigilo
+           DOCKER_TAG: ${{ github.sha }}
+         run: |
+           docker build -t $REGISTRY/$REPOSITORY:$DOCKER_TAG -f Dockerfile .
+           docker tag $REGISTRY/$REPOSITORY:$DOCKER_TAG $REGISTRY/$REPOSITORY:latest
+
+           docker push $REGISTRY/$REPOSITORY:$DOCKER_TAG
+           docker push $REGISTRY/$REPOSITORY:latest
