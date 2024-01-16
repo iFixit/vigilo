@@ -50,13 +50,3 @@ app.kubernetes.io/name: {{ include "vigilo.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
-{{/*
-Create the name of the service account to use
-*/}}
-{{- define "vigilo.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "vigilo.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
-{{- end }}
