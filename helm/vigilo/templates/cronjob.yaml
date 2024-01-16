@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: hello
+  name: {{ include "vigilo.fullname" . }}-cronjob
 spec:
   schedule: "*/1 * * * *" # every minute
   concurrencyPolicy: Forbid # skip if previous job is still running
@@ -11,12 +11,12 @@ spec:
     spec:
       template:
         spec:
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           containers:
-          - name: hello
-            image: busybox:1.28
-            imagePullPolicy: IfNotPresent
-            command:
-            - /bin/sh
-            - -c
-            - date; echo Hello from the Kubernetes cluster
+          - name: {{ .Chart.Name }}
+            image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default "latest" }}"
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
           restartPolicy: OnFailure

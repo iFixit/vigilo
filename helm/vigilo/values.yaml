@@ -1,2 +1,13 @@
 nameOverride: ""
 fullnameOverride: ""
+
+image:
+  # Vigilo is not currently available on Docker Hub
+  # You will need to build and push your own image to a registry
+  repository: ""
+  pullPolicy: Always
+  # Overrides the image tag whose default is latest
+  tag: ""
+
+imagePullSecrets:
+  - name: ""
