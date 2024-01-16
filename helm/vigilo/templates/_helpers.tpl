@@ -33,6 +33,11 @@ If release name contains chart name it will be used as a full name.
 {{- default (printf "%s-urls-cm" (include "vigilo.fullname" .)) .Values.configs.urls.configMapName | trunc 63 | trimSuffix "-" }}
 {{- end -}}
 
+{{/* Generate a default name for the DataDog Secret */}}
+{{- define "vigilo.datadogSecret.name" -}}
+{{- default (printf "%s-datadog-secret" (include "vigilo.fullname" .)) .Values.configs.datadogSecret.name | trunc 63 | trimSuffix "-" }}
+{{- end -}}
+
 {{/*
 Create chart name and version as used by the chart label.
 */}}

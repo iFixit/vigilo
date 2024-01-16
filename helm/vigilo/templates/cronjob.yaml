@@ -33,4 +33,7 @@ spec:
               - name: lighthouse-config-volume
                 mountPath: ./app/dist/lh-config.js
                 subPath: lh-config.js
+            envFrom:
+              - secretRef:
+                  name: {{ include "vigilo.datadogSecret.name" . }}
           restartPolicy: OnFailure

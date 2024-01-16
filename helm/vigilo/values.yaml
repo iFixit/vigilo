@@ -13,6 +13,15 @@ imagePullSecrets:
   - name: ""
 
 configs:
+  datadogSecret:
+    # The name of the secret containing the Datadog API keys
+    name: ""
+    # If the secret already exists, then disable create
+    create: true
+    keys:
+      apiKey: ""
+      appKey: ""
+
   urls:
     configMapName: ""
     # Represents the content of the urls.json file
