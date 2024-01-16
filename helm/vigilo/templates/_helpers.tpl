@@ -23,6 +23,16 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 {{- end }}
 
+{{/* Generate a default name for the Lighthouse Config ConfigMap */}}
+{{- define "vigilo.lighthouseConfigCM.name" -}}
+{{- default (printf "%s-lighthouse-cm" (include "vigilo.fullname" .)) .Values.configs.lighthouse.configMapName | trunc 63 | trimSuffix "-" }}
+{{- end -}}
+
+{{/* Generate a default name for the Urls ConfigMap */}}
+{{- define "vigilo.urlsCM.name" -}}
+{{- default (printf "%s-urls-cm" (include "vigilo.fullname" .)) .Values.configs.urls.configMapName | trunc 63 | trimSuffix "-" }}
+{{- end -}}
+
 {{/*
 Create chart name and version as used by the chart label.
 */}}
@@ -49,4 +59,3 @@ Selector labels
 app.kubernetes.io/name: {{ include "vigilo.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
-
