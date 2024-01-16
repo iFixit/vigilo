@@ -4,6 +4,9 @@ metadata:
   name: hello
 spec:
   schedule: "*/1 * * * *" # every minute
+  concurrencyPolicy: Forbid # skip if previous job is still running
+  successfulJobsHistoryLimit: 0 # keep no history of successful jobs
+  failedJobsHistoryLimit: 1 # keep only one failed job
   jobTemplate:
     spec:
       template:
