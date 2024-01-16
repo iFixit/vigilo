@@ -44,23 +44,3 @@ Create chart name and version as used by the chart label.
 {{- define "vigilo.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
-
-{{/*
-Common labels
-*/}}
-{{- define "vigilo.labels" -}}
-helm.sh/chart: {{ include "vigilo.chart" . }}
-{{ include "vigilo.selectorLabels" . }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- end }}
-
-{{/*
-Selector labels
-*/}}
-{{- define "vigilo.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "vigilo.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end }}
