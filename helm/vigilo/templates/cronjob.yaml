@@ -3,10 +3,10 @@ kind: CronJob
 metadata:
   name: {{ include "vigilo.fullname" . }}-cronjob
 spec:
-  schedule: "*/1 * * * *" # every minute
-  concurrencyPolicy: Forbid # skip if previous job is still running
-  successfulJobsHistoryLimit: 0 # keep no history of successful jobs
-  failedJobsHistoryLimit: 1 # keep only one failed job
+  schedule: "{{ .Values.cronjob.schedule }}"
+  concurrencyPolicy: {{ .Values.cronjob.concurrencyPolicy }}
+  successfulJobsHistoryLimit: {{ .Values.cronjob.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.cronjob.failedJobsHistoryLimit }}
   jobTemplate:
     spec:
       template:
