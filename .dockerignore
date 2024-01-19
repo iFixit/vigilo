@@ -7,3 +7,4 @@ bin
 .env
 lh-config.js
 urls.json
+helm

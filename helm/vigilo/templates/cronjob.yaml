@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "vigilo.fullname" . }}-cronjob
+spec:
+  schedule: "{{ .Values.cronjob.schedule }}"
+  concurrencyPolicy: {{ .Values.cronjob.concurrencyPolicy }}
+  successfulJobsHistoryLimit: {{ .Values.cronjob.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.cronjob.failedJobsHistoryLimit }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumes:
+            - name: urls-volume
+              configMap:
+                name: {{ include "vigilo.urlsCM.name" . }}
+            - name: lighthouse-config-volume
+              configMap:
+                name:  {{ include "vigilo.lighthouseConfigCM.name" . }}
+          containers:
+          - name: {{ .Chart.Name }}
+            image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default "latest" }}"
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            volumeMounts:
+              - name: urls-volume
+                mountPath: ./app/dist/urls.json
+                subPath: urls.json
+              - name: lighthouse-config-volume
+                mountPath: ./app/dist/lh-config.js
+                subPath: lh-config.js
+            envFrom:
+              - secretRef:
+                  name: {{ include "vigilo.datadogSecret.name" . }}
+          restartPolicy: OnFailure

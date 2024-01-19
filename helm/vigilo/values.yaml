@@ -1,0 +1,56 @@
+nameOverride: ""
+fullnameOverride: ""
+
+image:
+  # Vigilo is not currently available on Docker Hub
+  # You will need to build and push your own image to a registry
+  repository: ""
+  pullPolicy: Always
+  # Overrides the image tag whose default is latest
+  tag: ""
+
+imagePullSecrets:
+  - name: ""
+
+cronjob:
+  schedule: "*/10 * * * *" # Every 10 minutes
+  concurrencyPolicy: Forbid # skip if previous job is still running
+  successfulJobsHistoryLimit: 0 # keep no history of successful jobs
+  failedJobsHistoryLimit: 1 # keep only one failed job
+
+configs:
+  datadogSecret:
+    # The name of the secret containing the Datadog API keys
+    name: ""
+    # If the secret already exists, then disable create
+    create: true
+    keys:
+      apiKey: ""
+      appKey: ""
+
+  urls:
+    configMapName: ""
+    # Represents the content of the urls.json file
+    pages:
+      Test: ["https://www.wikipedia.org"]
+
+  lighthouse:
+    configMapName: ""
+    # Represents the content of the lh-config.js file
+    lighthouseConfig: |
+      export default {
+        extends: 'lighthouse:default',
+        settings: {
+            onlyAudits: [
+                "largest-contentful-paint",
+                "first-contentful-paint",
+                "cumulative-layout-shift",
+                "total-blocking-time",
+                "speed-index",
+                "total-byte-weight",
+                "server-response-time",
+                "is-crawlable",
+                "screenshot-thumbnails"
+            ]
+        }
+      }

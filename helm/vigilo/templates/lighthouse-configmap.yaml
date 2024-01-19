@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "vigilo.lighthouseConfigCM.name" . }}
+data:
+  lh-config.js: |
+    {{ .Values.configs.lighthouse.lighthouseConfig | nindent 6 }}
