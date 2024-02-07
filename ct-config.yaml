@@ -1,5 +1,5 @@
 charts-dir:
-  - helm
+  - charts
 helm-extra-args: "--timeout=5m"
 target-branch: main
 validate-maintainers: false
