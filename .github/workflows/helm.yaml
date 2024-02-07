@@ -4,11 +4,6 @@ on:
   pull_request:
   push:
 
-
-defaults:
-    run:
-        working-directory: helm/vigilo
-
 jobs:
   helm-lint-and-test:
     runs-on: ubuntu-latest
