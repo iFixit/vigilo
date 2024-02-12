@@ -2,7 +2,6 @@ import BrowserRunner from "./BrowserRunner.js"
 import LighthouseRunner from "./LighthouseRunner.js"
 import Datadog from "./DatadogClient.js"
 import {v1, v2} from '@datadog/datadog-api-client'
-import fs from 'node:fs'
 import os from 'node:os'
 import type { Flags, Result, Config } from 'lighthouse'
 import lhConfig from '@config/lh-config.js';
