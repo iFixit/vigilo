@@ -65,19 +65,10 @@ function retrieveDataPointsForAudits(results: Result, audits: string[]) {
 /**
  * Adds `rand={123..}` param to the urls to ensure we never hit a CDN cache.
  */
-function addRandomParamToUrl(inspectList: Record<string, string[]>): Record<string, string[]> {
-    const updatedInspectList: Record<string, string[]> = structuredClone(inspectList);
-
-    for (const pageType in updatedInspectList) {
-        const urls = updatedInspectList[pageType];
-
-        updatedInspectList[pageType] = urls.map(url => {
-            const urlObject = new URL(url);
-            urlObject.searchParams.append('rand', Math.floor(Math.random() * 1000000).toString());
-            return urlObject.toString();
-        });
-    }
-    return updatedInspectList;
+function addRandomParamToUrl(url: string): string {
+    const urlObject = new URL(url);
+    urlObject.searchParams.append('rand', Math.floor(Math.random() * 1000000).toString());
+    return urlObject.toString();
 }
 
 async function sendMetricsToDatadog(metricName: string, dataPoints: v2.MetricPoint[], tags: Record<string, string>, metadata?: v1.MetricMetadata) {
@@ -100,8 +91,9 @@ async function captureLighthouseMetrics(pageType: string, url: string, audits: s
 
     const formFactor = config.settings?.formFactor || 'mobile'
     console.log(`Running Lighthouse for ${url} with form factor: ${formFactor}`);
+    const randUrl = addRandomParamToUrl(url);
     const page = await browserRunner.start()
-    const results = await lighthouseRunner.run(url, {...options}, config, page)
+    const results = await lighthouseRunner.run(randUrl, {...options}, config, page)
 
     await browserRunner.stop()
 
@@ -134,7 +126,6 @@ async function captureLighthouseMetrics(pageType: string, url: string, audits: s
 }
 (async() => {
     let inspectList: Record<string, string[]> = URLS;
-    inspectList = addRandomParamToUrl(inspectList);
 
     const audits = lhConfig.settings.onlyAudits || []
 
