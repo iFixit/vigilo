@@ -15,7 +15,7 @@ type TimeseriesWidgetDefinition = Partial<v1.TimeseriesWidgetDefinition> & {
     requests: v1.TimeseriesWidgetRequest[]
 }
 
-const HOST = 'ubreakit.com';
+const HOST = process.env.HOST || 'docker-container';
 const INSPECT_LIST = URLS;
 const AUDITS = lhConfig.settings.onlyAudits || [];
 
