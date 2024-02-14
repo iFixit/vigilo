@@ -49,7 +49,9 @@ const CORE_BUILD = {
 const SCRIPTS_BUILD = {
   ...config,
   outDir: SCRIPTS_DIR,
-  entry: ['src/scripts/*'],
+  entry: {
+    createDashboard: 'src/scripts/create-dashboard/index.ts'
+  }
 }
 
 /**

@@ -117,34 +117,6 @@ function createTimeseriesWidgetsForAllPageTypes(audit: string): v1.Widget[] {
     return widgetDefinitions
 }
 
-function getWidgetForAllAudits(): v1.Widget[] {
-    const widgetDefinitions: v1.Widget[] = AUDITS.map(audit => {
-        const title = formatAuditName(audit);
-        const childWidgets = createTimeseriesWidgetsForAllPageTypes(audit);
-        return createGroupWidget({title: title, widgets: childWidgets})
-    })
-
-    return widgetDefinitions
-}
-
-function createDashboardsApiBody(): v1.DashboardsApiCreateDashboardRequest {
-    return {
-        body: {
-            title: "Temporary Lighthouse Reports",
-            templateVariables: [
-                {
-                  name: "FormFactor",
-                  prefix: "form_factor",
-                  availableValues: [],
-                  _default: "*",
-                },
-            ],
-            layoutType: "ordered",
-            widgets: getWidgetForAllAudits(),
-        }
-    }
-}
-
 (async() => {
     const dd = new Datadog({
         api_key: process.env.DD_API_KEY || '',
@@ -154,3 +126,31 @@ function createDashboardsApiBody(): v1.DashboardsApiCreateDashboardRequest {
     const params: v1.DashboardsApiCreateDashboardRequest = createDashboardsApiBody();
     await dd.createDashboard(params)
 })()
+
+function createDashboardsApiBody(): v1.DashboardsApiCreateDashboardRequest {
+    return {
+        body: {
+            title: "Temporary Lighthouse Reports",
+            templateVariables: [
+                {
+                  name: "FormFactor",
+                  prefix: "form_factor",
+                  availableValues: ["desktop", "mobile"],
+                  _default: "*",
+                },
+            ],
+            layoutType: "ordered",
+            widgets: getWidgetForAllAudits(),
+        }
+    }
+}
+
+function getWidgetForAllAudits(): v1.Widget[] {
+    const widgetDefinitions: v1.Widget[] = AUDITS.map(audit => {
+        const title = formatAuditName(audit);
+        const childWidgets = createTimeseriesWidgetsForAllPageTypes(audit);
+        return createGroupWidget({title: title, widgets: childWidgets})
+    })
+
+    return widgetDefinitions
+}
