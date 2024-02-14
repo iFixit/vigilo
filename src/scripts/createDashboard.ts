@@ -30,8 +30,8 @@ const ALERT_MARKERS_TIMESERIES = {
         "alert": "y > 4000",
     },
     'first-contentful-paint': {
-        "warning": "1.8 < y < 3",
-        "alert": "y > 3",
+        "warning": "100 < y < 300",
+        "alert": "y > 300",
     },
     'cumulative-layout-shift': {
         "warning": "0.1 < y < 0.25",
@@ -42,8 +42,8 @@ const ALERT_MARKERS_TIMESERIES = {
         "alert": "y > 600",
     },
     'speed-index': {
-        "warning": "3.4 < y < 5.8",
-        "alert": "y > 5.8",
+        "warning": "3400 < y < 5800",
+        "alert": "y > 5800",
     },
 };
 const ALERT_MARKERS_QUERY_VALUE = {
@@ -67,17 +67,17 @@ const ALERT_MARKERS_QUERY_VALUE = {
     'first-contentful-paint': [
         {
             "comparator": ">",
-            "value": 3,
+            "value": 300,
             "palette": "white_on_red"
         },
         {
             "comparator": ">=",
-            "value": 1.8,
+            "value": 100,
             "palette": "white_on_yellow"
         },
         {
             "comparator": "<",
-            "value": 1.8,
+            "value": 100,
             "palette": "white_on_green"
         }
     ],
@@ -118,17 +118,17 @@ const ALERT_MARKERS_QUERY_VALUE = {
     'speed-index': [
         {
             "comparator": ">",
-            "value": 5.8,
+            "value": 5800,
             "palette": "white_on_red"
         },
         {
             "comparator": ">=",
-            "value": 3.4,
+            "value": 3400,
             "palette": "white_on_yellow"
         },
         {
             "comparator": "<",
-            "value": 3.4,
+            "value": 3400,
             "palette": "white_on_green"
         }
     ],
