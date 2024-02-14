@@ -15,6 +15,10 @@ type TimeseriesWidgetDefinition = Partial<v1.TimeseriesWidgetDefinition> & {
     requests: v1.TimeseriesWidgetRequest[]
 }
 
+type QueryValueWidgetDefinition = Partial<v1.QueryValueWidgetDefinition> & {
+    requests: [v1.QueryValueWidgetRequest]
+}
+
 const HOST = process.env.HOST || 'docker-container';
 const INSPECT_LIST = URLS;
 const AUDITS = lhConfig.settings.onlyAudits || [];
@@ -188,6 +192,22 @@ function createWidgetRequestsForQueryValueMetric(audit: string, pageType: string
         }
     ]
 }
+
+function createQueryValueWidget(widget: QueryValueWidgetDefinition): v1.Widget {
+    return {
+        definition: {
+            title: "",
+            titleSize: "16",
+            titleAlign: "left",
+            type: "query_value",
+            autoscale: true,
+            precision: 2,
+            ...widget
+        }
+    }
+}
+
+function createTimeseriesWidget(widget: TimeseriesWidgetDefinition): v1.Widget {
     return {
         definition: {
             title: "",
