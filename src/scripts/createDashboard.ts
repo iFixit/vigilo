@@ -20,7 +20,7 @@ const INSPECT_LIST = URLS;
 const AUDITS = lhConfig.settings.onlyAudits || [];
 
 // Auditname -> {warning: "warning value", alert: "alert value"}
-const ALERT_MARKERS = {
+const ALERT_MARKERS_TIMESERIES = {
     'largest-contentful-paint': {
         "warning": "2500 < y < 4000",
         "alert": "y > 4000",
@@ -42,20 +42,111 @@ const ALERT_MARKERS = {
         "alert": "y > 5.8",
     },
 };
+const ALERT_MARKERS_QUERY_VALUE = {
+    'largest-contentful-paint': [
+        {
+            "comparator": ">",
+            "value": 4000,
+            "palette": "white_on_red"
+        },
+        {
+            "comparator": ">=",
+            "value": 2500,
+            "palette": "white_on_yellow"
+        },
+        {
+            "comparator": "<",
+            "value": 2500,
+            "palette": "white_on_green"
+        }
+    ],
+    'first-contentful-paint': [
+        {
+            "comparator": ">",
+            "value": 3,
+            "palette": "white_on_red"
+        },
+        {
+            "comparator": ">=",
+            "value": 1.8,
+            "palette": "white_on_yellow"
+        },
+        {
+            "comparator": "<",
+            "value": 1.8,
+            "palette": "white_on_green"
+        }
+    ],
+    'cumulative-layout-shift': [
+        {
+            "comparator": ">",
+            "value": 0.25,
+            "palette": "white_on_red"
+        },
+        {
+            "comparator": ">=",
+            "value": 0.1,
+            "palette": "white_on_yellow"
+        },
+        {
+            "comparator": "<",
+            "value": 0.1,
+            "palette": "white_on_green"
+        }
+    ],
+    'total-blocking-time': [
+        {
+            "comparator": ">",
+            "value": 600,
+            "palette": "white_on_red"
+        },
+        {
+            "comparator": ">=",
+            "value": 200,
+            "palette": "white_on_yellow"
+        },
+        {
+            "comparator": "<",
+            "value": 200,
+            "palette": "white_on_green"
+        }
+    ],
+    'speed-index': [
+        {
+            "comparator": ">",
+            "value": 5.8,
+            "palette": "white_on_red"
+        },
+        {
+            "comparator": ">=",
+            "value": 3.4,
+            "palette": "white_on_yellow"
+        },
+        {
+            "comparator": "<",
+            "value": 3.4,
+            "palette": "white_on_green"
+        }
+    ],
+};
 
-function fetchAlertMarkersForAudit(auditName: string) {
-    return ALERT_MARKERS.hasOwnProperty(auditName) ? [
+function fetchTimeseriesAlertMarkersForAudit(auditName: string) {
+    return ALERT_MARKERS_TIMESERIES.hasOwnProperty(auditName) ? [
         {
             "label": "Alert",
-            "value": ALERT_MARKERS[auditName].alert,
+            "value": ALERT_MARKERS_TIMESERIES[auditName].alert,
             "display_type": "error dashed"
         },
         {
             "label": "Warning",
-            "value": ALERT_MARKERS[auditName].warning,
+            "value": ALERT_MARKERS_TIMESERIES[auditName].warning,
             "display_type": "warning dashed"
         }
     ] : []
+}
+
+function fetchQueryValueAlertMarkersForAudit(auditName: string) {
+    return ALERT_MARKERS_QUERY_VALUE.hasOwnProperty(auditName) ? ALERT_MARKERS_QUERY_VALUE[auditName] : []
 }
 
 function createWidgetRequestsForMetric(audit: string, pageType: string): v1.TimeseriesWidgetRequest[] {
