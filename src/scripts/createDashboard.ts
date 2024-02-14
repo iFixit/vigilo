@@ -193,7 +193,7 @@ function createWidgetRequestsForQueryValueMetric(audit: string, pageType: string
     ]
 }
 
-function createQueryValueWidget(widget: QueryValueWidgetDefinition): v1.Widget {
+function createQueryValueWidget(widget: QueryValueWidgetDefinition, width: number, height: number, x: number, y: number): v1.Widget {
     return {
         definition: {
             title: "",
@@ -203,11 +203,17 @@ function createQueryValueWidget(widget: QueryValueWidgetDefinition): v1.Widget {
             autoscale: true,
             precision: 2,
             ...widget
+        },
+        layout: {
+            width: width,
+            height: height,
+            x: x,
+            y: y
         }
     }
 }
 
-function createTimeseriesWidget(widget: TimeseriesWidgetDefinition): v1.Widget {
+function createTimeseriesWidget(widget: TimeseriesWidgetDefinition, width: number, height: number, x: number, y: number): v1.Widget {
     return {
         definition: {
             title: "",
@@ -216,6 +222,12 @@ function createTimeseriesWidget(widget: TimeseriesWidgetDefinition): v1.Widget {
             type: "timeseries",
             showLegend: true,
             ...widget
+        },
+        layout: {
+            width: width,
+            height: height,
+            x: x,
+            y: y
         }
     }
 }
