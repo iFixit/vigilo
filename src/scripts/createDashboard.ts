@@ -271,7 +271,23 @@ function createWidgetPairsForAllPageTypes(audit: string): v1.Widget[] {
 
         x += queryValueSize.width;
 
-        const timeseriesWidget = createTimeseriesWidget({title: pageType, requests: timeseriesRequests, markers: timeseriesAlertMarkers}, timeseriesSize.width, timeseriesSize.height, x, y);
+        const timeseriesWidget = createTimeseriesWidget(
+            {
+                title: pageType,
+                requests: timeseriesRequests,
+                markers: timeseriesAlertMarkers,
+                customLinks: [
+                    {
+                        "label": "Visit Webpage",
+                        "link": "{{url.value}}"
+                    }
+                ]
+            },
+            timeseriesSize.width,
+            timeseriesSize.height,
+            x,
+            y
+        );
 
         x += timeseriesSize.width;
 
