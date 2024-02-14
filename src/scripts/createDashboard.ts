@@ -139,12 +139,12 @@ function fetchTimeseriesAlertMarkersForAudit(auditName: string) {
         {
             "label": "Alert",
             "value": ALERT_MARKERS_TIMESERIES[auditName].alert,
-            "display_type": "error dashed"
+            "displayType": "error dashed"
         },
         {
             "label": "Warning",
             "value": ALERT_MARKERS_TIMESERIES[auditName].warning,
-            "display_type": "warning dashed"
+            "displayType": "warning dashed"
         }
     ] : []
 }
