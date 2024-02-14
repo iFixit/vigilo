@@ -244,13 +244,39 @@ function createGroupWidget(widget: GroupWidgetDefinition): v1.Widget {
     }
 }
 
-function createTimeseriesWidgetsForAllPageTypes(audit: string): v1.Widget[] {
+function createWidgetPairsForAllPageTypes(audit: string): v1.Widget[] {
     const pageTypes = Object.keys(INSPECT_LIST);
-    const alertMarkers = fetchAlertMarkersForAudit(audit);
-    const widgetDefinitions = pageTypes.map(pageType => {
-        const requests = createWidgetRequestsForMetric(audit, pageType);
-        return createTimeseriesWidget({title: pageType, requests: requests, markers: alertMarkers})
-    })
+
+    const queryValueSize = {width: 2, height: 2};
+    const timeseriesSize = {width: 4, height: 2};
+
+    const queryValueAlertMarkers = fetchQueryValueAlertMarkersForAudit(audit);
+    const timeseriesAlertMarkers = fetchTimeseriesAlertMarkersForAudit(audit);
+
+    const widgetDefinitions:v1.Widget[] = [];
+
+    let x = 0;
+    let y = 0;
+
+    for (const pageType of pageTypes) {
+        if (x === 12) {
+            x = 0;
+            y += 2;
+        }
+
+        const queryValueRequests = createWidgetRequestsForQueryValueMetric(audit, pageType, queryValueAlertMarkers);
+        const timeseriesRequests = createWidgetRequestsForTimeseriesMetric(audit, pageType);
+
+        const queryValueWidget = createQueryValueWidget({title: pageType, requests: queryValueRequests }, queryValueSize.width, queryValueSize.height, x, y);
+
+        x += queryValueSize.width;
+
+        const timeseriesWidget = createTimeseriesWidget({title: pageType, requests: timeseriesRequests, markers: timeseriesAlertMarkers}, timeseriesSize.width, timeseriesSize.height, x, y);
+
+        x += timeseriesSize.width;
+
+        widgetDefinitions.push(queryValueWidget, timeseriesWidget);
+    }
 
     return widgetDefinitions
 }
@@ -258,7 +284,7 @@ function createTimeseriesWidgetsForAllPageTypes(audit: string): v1.Widget[] {
 function getWidgetForAllAudits(): v1.Widget[] {
     const widgetDefinitions: v1.Widget[] = AUDITS.map(audit => {
         const title = formatAuditName(audit);
-        const childWidgets = createTimeseriesWidgetsForAllPageTypes(audit);
+        const childWidgets = createWidgetPairsForAllPageTypes(audit);
         return createGroupWidget({title: title, widgets: childWidgets})
     })
 
