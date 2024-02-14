@@ -157,7 +157,7 @@ function createWidgetRequestsForTimeseriesMetric(audit: string, pageType: string
                 {
                     name: "query1",
                     dataSource: "metrics",
-                    query: `avg:lighthouse.${formatMetricNameForDatadog(audit)}{host:${HOST},page_type:${formatMetricNameForDatadog(pageType)},$FormFactor} by {page_type,url,form_factor}`
+                    query: `avg:lighthouse.${formatMetricNameForDatadog(audit)}.value{host:${HOST},page_type:${formatMetricNameForDatadog(pageType)},$FormFactor} by {url, form_factor}`
                 },
             ],
             formulas: [ {formula: "query1"} ],
@@ -179,7 +179,7 @@ function createWidgetRequestsForQueryValueMetric(audit: string, pageType: string
                 {
                     name: "query1",
                     dataSource: "metrics",
-                    query: `avg:lighthouse.${formatMetricNameForDatadog(audit)}{host:${HOST},page_type:${formatMetricNameForDatadog(pageType)},$FormFactor}`,
+                    query: `avg:lighthouse.${formatMetricNameForDatadog(audit)}.value{host:${HOST},page_type:${formatMetricNameForDatadog(pageType)},$FormFactor}`,
                     aggregator: "avg"
                 }
             ],
