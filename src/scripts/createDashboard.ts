@@ -149,7 +149,7 @@ function fetchQueryValueAlertMarkersForAudit(auditName: string) {
     return ALERT_MARKERS_QUERY_VALUE.hasOwnProperty(auditName) ? ALERT_MARKERS_QUERY_VALUE[auditName] : []
 }
 
-function createWidgetRequestsForMetric(audit: string, pageType: string): v1.TimeseriesWidgetRequest[] {
+function createWidgetRequestsForTimeseriesMetric(audit: string, pageType: string): v1.TimeseriesWidgetRequest[] {
     return [
         {
             responseFormat: "timeseries",
@@ -171,8 +171,23 @@ function createWidgetRequestsForMetric(audit: string, pageType: string): v1.Time
     ]
 }
 
-function createTimeseriesWidget(widget: TimeseriesWidgetDefinition): v1.Widget {
-
+function createWidgetRequestsForQueryValueMetric(audit: string, pageType: string, alerts: v1.WidgetConditionalFormat[]): [v1.QueryValueWidgetRequest] {
+    return [
+        {
+            responseFormat: "scalar",
+            queries: [
+                {
+                    name: "query1",
+                    dataSource: "metrics",
+                    query: `avg:lighthouse.${formatMetricNameForDatadog(audit)}{host:${HOST},page_type:${formatMetricNameForDatadog(pageType)},$FormFactor}`,
+                    aggregator: "avg"
+                }
+            ],
+            formulas: [ {formula: "query1"} ],
+            conditionalFormats: alerts
+        }
+    ]
+}
     return {
         definition: {
             title: "",
