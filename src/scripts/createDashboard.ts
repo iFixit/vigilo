@@ -15,19 +15,23 @@ type TimeseriesWidgetDefinition = Partial<v1.TimeseriesWidgetDefinition> & {
     requests: v1.TimeseriesWidgetRequest[]
 }
 
-const HOST = 'ubreakit.com';
+type QueryValueWidgetDefinition = Partial<v1.QueryValueWidgetDefinition> & {
+    requests: [v1.QueryValueWidgetRequest]
+}
+
+const HOST = process.env.HOST || 'docker-container';
 const INSPECT_LIST = URLS;
 const AUDITS = lhConfig.settings.onlyAudits || [];
 
 // Auditname -> {warning: "warning value", alert: "alert value"}
-const ALERT_MARKERS = {
+const ALERT_MARKERS_TIMESERIES = {
     'largest-contentful-paint': {
         "warning": "2500 < y < 4000",
         "alert": "y > 4000",
     },
     'first-contentful-paint': {
-        "warning": "1.8 < y < 3",
-        "alert": "y > 3",
+        "warning": "100 < y < 300",
+        "alert": "y > 300",
     },
     'cumulative-layout-shift': {
         "warning": "0.1 < y < 0.25",
@@ -38,27 +42,118 @@ const ALERT_MARKERS = {
         "alert": "y > 600",
     },
     'speed-index': {
-        "warning": "3.4 < y < 5.8",
-        "alert": "y > 5.8",
+        "warning": "3400 < y < 5800",
+        "alert": "y > 5800",
     },
 };
+const ALERT_MARKERS_QUERY_VALUE = {
+    'largest-contentful-paint': [
+        {
+            "comparator": ">",
+            "value": 4000,
+            "palette": "white_on_red"
+        },
+        {
+            "comparator": ">=",
+            "value": 2500,
+            "palette": "white_on_yellow"
+        },
+        {
+            "comparator": "<",
+            "value": 2500,
+            "palette": "white_on_green"
+        }
+    ],
+    'first-contentful-paint': [
+        {
+            "comparator": ">",
+            "value": 300,
+            "palette": "white_on_red"
+        },
+        {
+            "comparator": ">=",
+            "value": 100,
+            "palette": "white_on_yellow"
+        },
+        {
+            "comparator": "<",
+            "value": 100,
+            "palette": "white_on_green"
+        }
+    ],
+    'cumulative-layout-shift': [
+        {
+            "comparator": ">",
+            "value": 0.25,
+            "palette": "white_on_red"
+        },
+        {
+            "comparator": ">=",
+            "value": 0.1,
+            "palette": "white_on_yellow"
+        },
+        {
+            "comparator": "<",
+            "value": 0.1,
+            "palette": "white_on_green"
+        }
+    ],
+    'total-blocking-time': [
+        {
+            "comparator": ">",
+            "value": 600,
+            "palette": "white_on_red"
+        },
+        {
+            "comparator": ">=",
+            "value": 200,
+            "palette": "white_on_yellow"
+        },
+        {
+            "comparator": "<",
+            "value": 200,
+            "palette": "white_on_green"
+        }
+    ],
+    'speed-index': [
+        {
+            "comparator": ">",
+            "value": 5800,
+            "palette": "white_on_red"
+        },
+        {
+            "comparator": ">=",
+            "value": 3400,
+            "palette": "white_on_yellow"
+        },
+        {
+            "comparator": "<",
+            "value": 3400,
+            "palette": "white_on_green"
+        }
+    ],
+};
 
-function fetchAlertMarkersForAudit(auditName: string) {
-    return ALERT_MARKERS.hasOwnProperty(auditName) ? [
+function fetchTimeseriesAlertMarkersForAudit(auditName: string) {
+    return ALERT_MARKERS_TIMESERIES.hasOwnProperty(auditName) ? [
         {
             "label": "Alert",
-            "value": ALERT_MARKERS[auditName].alert,
-            "display_type": "error dashed"
+            "value": ALERT_MARKERS_TIMESERIES[auditName].alert,
+            "displayType": "error dashed"
         },
         {
             "label": "Warning",
-            "value": ALERT_MARKERS[auditName].warning,
-            "display_type": "warning dashed"
+            "value": ALERT_MARKERS_TIMESERIES[auditName].warning,
+            "displayType": "warning dashed"
         }
     ] : []
 }
 
-function createWidgetRequestsForMetric(audit: string, pageType: string): v1.TimeseriesWidgetRequest[] {
+function fetchQueryValueAlertMarkersForAudit(auditName: string) {
+    return ALERT_MARKERS_QUERY_VALUE.hasOwnProperty(auditName) ? ALERT_MARKERS_QUERY_VALUE[auditName] : []
+}
+
+function createWidgetRequestsForTimeseriesMetric(audit: string, pageType: string): v1.TimeseriesWidgetRequest[] {
     return [
         {
             responseFormat: "timeseries",
@@ -66,7 +161,7 @@ function createWidgetRequestsForMetric(audit: string, pageType: string): v1.Time
                 {
                     name: "query1",
                     dataSource: "metrics",
-                    query: `avg:lighthouse.${formatMetricNameForDatadog(audit)}{host:${HOST},page_type:${formatMetricNameForDatadog(pageType)},$FormFactor} by {page_type,url,form_factor}`
+                    query: `avg:lighthouse.${formatMetricNameForDatadog(audit)}.value{host:${HOST},page_type:${formatMetricNameForDatadog(pageType)},$FormFactor} by {url, form_factor}`
                 },
             ],
             formulas: [ {formula: "query1"} ],
@@ -80,8 +175,45 @@ function createWidgetRequestsForMetric(audit: string, pageType: string): v1.Time
     ]
 }
 
-function createTimeseriesWidget(widget: TimeseriesWidgetDefinition): v1.Widget {
+function createWidgetRequestsForQueryValueMetric(audit: string, pageType: string, alerts: v1.WidgetConditionalFormat[]): [v1.QueryValueWidgetRequest] {
+    return [
+        {
+            responseFormat: "scalar",
+            queries: [
+                {
+                    name: "query1",
+                    dataSource: "metrics",
+                    query: `avg:lighthouse.${formatMetricNameForDatadog(audit)}.value{host:${HOST},page_type:${formatMetricNameForDatadog(pageType)},$FormFactor}`,
+                    aggregator: "avg"
+                }
+            ],
+            formulas: [ {formula: "query1"} ],
+            conditionalFormats: alerts
+        }
+    ]
+}
 
+function createQueryValueWidget(widget: QueryValueWidgetDefinition, width: number, height: number, x: number, y: number): v1.Widget {
+    return {
+        definition: {
+            title: "",
+            titleSize: "16",
+            titleAlign: "left",
+            type: "query_value",
+            autoscale: true,
+            precision: 2,
+            ...widget
+        },
+        layout: {
+            width: width,
+            height: height,
+            x: x,
+            y: y
+        }
+    }
+}
+
+function createTimeseriesWidget(widget: TimeseriesWidgetDefinition, width: number, height: number, x: number, y: number): v1.Widget {
     return {
         definition: {
             title: "",
@@ -90,6 +222,12 @@ function createTimeseriesWidget(widget: TimeseriesWidgetDefinition): v1.Widget {
             type: "timeseries",
             showLegend: true,
             ...widget
+        },
+        layout: {
+            width: width,
+            height: height,
+            x: x,
+            y: y
         }
     }
 }
@@ -106,13 +244,55 @@ function createGroupWidget(widget: GroupWidgetDefinition): v1.Widget {
     }
 }
 
-function createTimeseriesWidgetsForAllPageTypes(audit: string): v1.Widget[] {
+function createWidgetPairsForAllPageTypes(audit: string): v1.Widget[] {
     const pageTypes = Object.keys(INSPECT_LIST);
-    const alertMarkers = fetchAlertMarkersForAudit(audit);
-    const widgetDefinitions = pageTypes.map(pageType => {
-        const requests = createWidgetRequestsForMetric(audit, pageType);
-        return createTimeseriesWidget({title: pageType, requests: requests, markers: alertMarkers})
-    })
+
+    const queryValueSize = {width: 2, height: 2};
+    const timeseriesSize = {width: 4, height: 2};
+
+    const queryValueAlertMarkers = fetchQueryValueAlertMarkersForAudit(audit);
+    const timeseriesAlertMarkers = fetchTimeseriesAlertMarkersForAudit(audit);
+
+    const widgetDefinitions:v1.Widget[] = [];
+
+    let x = 0;
+    let y = 0;
+
+    for (const pageType of pageTypes) {
+        if (x === 12) {
+            x = 0;
+            y += 2;
+        }
+
+        const queryValueRequests = createWidgetRequestsForQueryValueMetric(audit, pageType, queryValueAlertMarkers);
+        const timeseriesRequests = createWidgetRequestsForTimeseriesMetric(audit, pageType);
+
+        const queryValueWidget = createQueryValueWidget({title: pageType, requests: queryValueRequests }, queryValueSize.width, queryValueSize.height, x, y);
+
+        x += queryValueSize.width;
+
+        const timeseriesWidget = createTimeseriesWidget(
+            {
+                title: pageType,
+                requests: timeseriesRequests,
+                markers: timeseriesAlertMarkers,
+                customLinks: [
+                    {
+                        "label": "Visit Webpage",
+                        "link": "{{url.value}}"
+                    }
+                ]
+            },
+            timeseriesSize.width,
+            timeseriesSize.height,
+            x,
+            y
+        );
+
+        x += timeseriesSize.width;
+
+        widgetDefinitions.push(queryValueWidget, timeseriesWidget);
+    }
 
     return widgetDefinitions
 }
@@ -120,7 +300,7 @@ function createTimeseriesWidgetsForAllPageTypes(audit: string): v1.Widget[] {
 function getWidgetForAllAudits(): v1.Widget[] {
     const widgetDefinitions: v1.Widget[] = AUDITS.map(audit => {
         const title = formatAuditName(audit);
-        const childWidgets = createTimeseriesWidgetsForAllPageTypes(audit);
+        const childWidgets = createWidgetPairsForAllPageTypes(audit);
         return createGroupWidget({title: title, widgets: childWidgets})
     })
 
